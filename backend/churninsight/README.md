@@ -46,6 +46,25 @@ El repositorio raíz **no es un proyecto Java** y no se ejecuta directamente.
 
 ---
 
+### 📁 Estructura del proyecto backend
+```
+src/main/java/com/churninsight/  
+├── controller/ # Endpoints REST  
+├── service/ # Lógica de negocio  
+├── dto/ # Objetos de entrada y salida (Request / Response)  
+├── exception/ # Manejo centralizado de errores  
+└── config/ # Configuraciones del proyecto  
+```
+
+#### 📌 Responsabilidad de cada capa
+- **controller**: recibe las solicitudes HTTP y retorna las respuestas
+- **service**: contiene la lógica de negocio
+- **dto**: define los contratos de datos de entrada y salida de la API
+- **exception**: centraliza el manejo de errores y excepciones
+- **config**: configuraciones generales del proyecto
+
+---
+
 ### ▶️ Cómo ejecutar el backend
 
 #### 🔹 Requisitos
