@@ -43,21 +43,33 @@ POST /predict
 **JSON de salida**
 ```json
 {
-"churn_prediction": true,
-"churn_probability": 0.76
+  "prediction": "Va a cancelar",
+  "probability": 0.91
 }
 ```
+#### 📌 Definiciones
+
+**prediction:** resultado de la clasificación del modelo
+
+- "Va a cancelar"
+- "Va a continuar"
+
+**probability:** probabilidad asociada a la predicción (valor entre 0 y 1)  
+
 ---
 ### 🔁 Response final (Backend → Cliente)
 
 El backend agrega información de negocio:
 ```json
 {
-"customer_id": "C012",
-"churn_prediction": true,
-"churn_probability": 0.76
+  "customer_id": "C012",
+  "prediction": "Va a cancelar",
+  "probability": 0.91
 }
 ```
+#### 📌 Nota sobre identificadores
+> El identificador del cliente (customer_id) es gestionado exclusivamente por el backend.
+El servicio de Data Science no recibe ni retorna IDs, solo procesa features del modelo.
 
 
 
