@@ -1,75 +1,101 @@
 # 📜 Contrato de Integración – Predicción de Churn
 ### 🎯 Objetivo
 
-Definir el formato de intercambio de datos entre el Backend (Spring Boot) y el servicio de Machine Learning (FastAPI) para la predicción de churn.
+Definir el estándar de comunicación entre el Backend (Java / Spring Boot) y el servicio de Data Science (Python / FastAPI) para la predicción de Churn en la plataforma Netflix.
 
-El backend es responsable de:
+Este contrato establece:
 
-- recibir solicitudes del cliente
-- validar datos
-- gestionar identificadores
-- consumir el servicio de ML
-
-El servicio de ML:
-
-- recibe únicamente las features
-- retorna la predicción y su probabilidad
+- El formato de intercambio de datos
+- Las responsabilidades de cada equipo
+- Las reglas de validación
+- El manejo de errores y excepciones
 
 ---
 
-### 🔗 Servicio de predicción (Data Science)
-**Endpoint**
-```
-POST /predict
-```
+### 🛠️ Responsabilidades por Equipo
+
+- **Backend (Java):** 
+    - Gestionar y validar el `customer_id`
+    - Validar rangos y tipos de datos
+    - Manejar errores de red (timeouts) 
+    - Asegurar la disponibilidad del API frente al cliente final.    
+    
+
+- **Data Science (Python):**  
+    - Transformar variables categóricas
+    - Ejecutar el modelo de inferencia y
+    - Garantizar que la probabilidad retornada esté en el rango [0, 1].
+
 ---
 
-### 📥 Request (Backend → Data Science)
-**JSON de entrada (features del modelo)**
+### 🔗 Endpoint de Predicción
+
+- URL: http://localhost:8000/predict
+- Método: POST
+- Content-Type: application/json
+
+---
+
+### 📥 Solicitud (Backend → Data Science)
+
+El Backend debe enviar los datos respetando exactamente las mayúsculas y minúsculas del dataset original (case sensitive).
+
 ```json
 {
-"subscription_type": "premium",
-"watch_hours": 120.5,
-"last_login_days": 3,
-"monthly_fee": 15.99,
-"number_of_profiles": 4,
-"avg_watch_time_per_day": 2.8
+  "customer_id": "4d71f6ce-fca9-4ff7-8afa-197ac24de14b",
+  "features": {
+    "subscription_type": "Standard",
+    "watch_hours": 16.32,
+    "last_login_days": 10,
+    "monthly_fee": 13.99,
+    "payment_method": "Crypto",
+    "number_of_profiles": 2,
+    "avg_watch_time_per_day": 1.48
+  }
 }
 ```
 
----
+### 📋 Diccionario de Datos y Reglas (Validación)
 
-### 📤 Response (Data Science → Backend)
-**JSON de salida**
-```json
-{
-  "prediction": "Va a cancelar",
-  "probability": 0.91
-}
-```
-#### 📌 Definiciones
-
-**prediction:** resultado de la clasificación del modelo
-
-- "Va a cancelar"
-- "Va a continuar"
-
-**probability:** probabilidad asociada a la predicción (valor entre 0 y 1)  
+| Campo                    | Tipo    | Valores Permitidos / Reglas                                  | Descripción                                 |
+| ------------------------ | ------- | ------------------------------------------------------------ | ------------------------------------------- |
+| `subscription_type`      | String  | `Basic`, `Standard`, `Premium`                               | Plan contratado (sensible a mayúsculas).    |
+| `watch_hours`            | Double  | Valor ≥ 0.0                                                  | Total de horas de visualización acumuladas. |
+| `last_login_days`        | Integer | Valor ≥ 0                                                    | Días desde el último acceso.                |
+| `monthly_fee`            | Double  | `8.99`, `13.99`, `17.99`                                     | Costo mensual según el plan.                |
+| `payment_method`         | String  | `Credit Card`, `Debit Card`, `PayPal`, `Gift Card`, `Crypto` | Método de pago registrado.                  |
+| `number_of_profiles`     | Integer | Rango de 1 a 5                                               | Perfiles creados en la cuenta.              |
+| `avg_watch_time_per_day` | Double  | Valor ≥ 0.0                                                  | Promedio diario de uso de la plataforma.    |
 
 ---
-### 🔁 Response final (Backend → Cliente)
 
-El backend agrega información de negocio:
+### 📤 Respuesta (Data Science → Backend)
+El servicio de ML responde con la predicción calculada y su probabilidad asociada.
+
 ```json
 {
-  "customer_id": "C012",
-  "prediction": "Va a cancelar",
-  "probability": 0.91
+  "customer_id": "4d71f6ce-fca9-4ff7-8afa-197ac24de14b",
+  "prediction": {
+    "label": "will_churn",
+    "probability": 0.91
+  }
 }
 ```
-#### 📌 Nota sobre identificadores
-> El identificador del cliente (customer_id) es gestionado exclusivamente por el backend.
-El servicio de Data Science no recibe ni retorna IDs, solo procesa features del modelo.
+### 📌 Definiciones de Salida
+- **label:** Resultado categórico de la predicción.  
+  Valores permitidos:
+    - `will_churn`
+    - `will_continue`
 
+- **probability:** Probabilidad asociada a la predicción.  
+  Rango válido: `0.0` – `1.0`
 
+---
 
+### 🛑 Protocolo de Errores
+
+El cumplimiento de estos códigos HTTP es **obligatorio** para garantizar la estabilidad de la integración entre **Backend (Java)** y **Machine Learning (Python)**.
+
+| Código HTTP | Uso                                            |
+| ----------- | ---------------------------------------------- |
+| 400         | Solicitud inválida o predicción no procesable. |
