@@ -9,7 +9,7 @@ La predicción se expone mediante una API, permitiendo a sistemas externos consu
 
 ---
 
-### 💾 Descripción del dataSet
+### 💾 Descripción del dataset
 
 El dataset consta de 14 columnas y 5000 filas.
  Las columnas son las siguientes:
@@ -41,7 +41,7 @@ Detectar clientes con alta probabilidad de churn permite:
 - Reducir pérdidas económicas
 - Mejorar la toma de decisiones basada en datos
 
-### 🛠️ Tecnologías utilizadas
+### 📊 Tecnologías utilizadas
 
 ## EDA
 
@@ -53,3 +53,11 @@ Detectar clientes con alta probabilidad de churn permite:
 ## Modelo predictivo
 
 -librerias de sklearn
+
+
+## Análisis estadístico
+
+El análisis estadístico con Chi Cuadrado y la V de Cramer se usa para determinar
+si hay asociación significativa entre dos variables categóricas y qué tan fuerte
+es esa relación.
+
