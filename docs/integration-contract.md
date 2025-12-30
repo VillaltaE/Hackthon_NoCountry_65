@@ -48,9 +48,9 @@ El Backend debe enviar los datos respetando exactamente las mayúsculas y minús
     "watch_hours": 16.32,
     "last_login_days": 10,
     "monthly_fee": 13.99,
-    "payment_method": "Crypto",
     "number_of_profiles": 2,
-    "avg_watch_time_per_day": 1.48
+    "avg_watch_time_per_day": 1.48,
+    "payment_method": "Crypto"
   }
 }
 ```
