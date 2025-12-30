@@ -61,3 +61,7 @@ El análisis estadístico con Chi Cuadrado y la V de Cramer se usa para determin
 si hay asociación significativa entre dos variables categóricas y qué tan fuerte
 es esa relación.
 
+## Modelo seleccionado
+
+Se seleccionó el modelo de LogisticRegression porque presenta una precisión de 0.89, se hizo prueba con el
+modelo RandomForest pero este modelo sobreajustaba los datos (precisión 0.99)
