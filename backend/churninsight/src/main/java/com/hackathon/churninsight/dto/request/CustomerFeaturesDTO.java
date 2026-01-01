@@ -18,10 +18,12 @@ public record CustomerFeaturesDTO(
                 inclusive = false,
                 message = "Las horas vistas deben ser mayores a 0"
         )
+        @JsonProperty("watch_hours")
         Double watchHours,
 
         @NotNull
         @Min(value = 0, message = "Los días desde el último login no pueden ser negativos")
+        @JsonProperty("last_login_days")
         Integer lastLoginDays,
 
         @NotNull
