@@ -6,6 +6,7 @@ import com.hackathon.churninsight.dto.response.SuccessResponseDTO;
 import com.hackathon.churninsight.service.PredictService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/predict")
+@Slf4j
 public class PredictController {
 
     private final PredictService predictService;
@@ -25,19 +27,23 @@ public class PredictController {
     @PostMapping
     public ResponseEntity<SuccessResponseDTO<PredictResponseDTO>> predict(
             @Valid @RequestBody PredictRequestDTO request,
-            HttpServletRequest httpRequest
-    ) {
+            HttpServletRequest httpRequest) {
+
+        log.info("Recibida solicitud de predicción para cliente: {}", request.customerId());
+
         PredictResponseDTO prediction = predictService.predict(request);
+
+        log.info("Predicción generada exitosamente para cliente: {} - Resultado: {}",
+                request.customerId(),
+                prediction.prediction().label());
 
         SuccessResponseDTO<PredictResponseDTO> response = new SuccessResponseDTO<>(
                 LocalDateTime.now(),
                 HttpStatus.OK.value(),
                 "Predicción generada correctamente",
                 prediction,
-                httpRequest.getRequestURI()
-        );
+                httpRequest.getRequestURI());
 
         return ResponseEntity.ok(response);
     }
 }
-
