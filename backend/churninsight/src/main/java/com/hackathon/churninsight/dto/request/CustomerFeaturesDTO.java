@@ -50,7 +50,7 @@ public record CustomerFeaturesDTO(
     // Validación cruzada Plan vs Precio
     @AssertTrue(message = "La tarifa mensual no coincide con el plan seleccionado")
     private boolean isPlanPriceConsistent() {
-        if (subscriptionType == null || monthlyFee == null) return false;
+        if (subscriptionType == null || monthlyFee == null) return true;
 
         return switch (subscriptionType) {
             case "Basic" -> Math.abs(monthlyFee - 8.99) < 0.01;
