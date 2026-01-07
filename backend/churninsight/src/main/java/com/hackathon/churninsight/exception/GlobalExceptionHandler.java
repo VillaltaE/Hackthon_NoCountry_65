@@ -129,6 +129,22 @@ public class GlobalExceptionHandler {
                                 request.getRequestURI());
         }
 
+        @ExceptionHandler(IllegalArgumentException.class)
+        public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(
+                IllegalArgumentException ex,
+                HttpServletRequest request) {
+
+            Map<String, String> details = new HashMap<>();
+            details.put("error", ex.getMessage());
+
+            return buildErrorResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "Valor inválido",
+                    details,
+                    request.getRequestURI()
+            );
+        }
+
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ErrorResponseDTO> handleGeneralException(
                         Exception ex,
