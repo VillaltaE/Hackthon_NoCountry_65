@@ -49,22 +49,40 @@ public class GlobalExceptionHandler {
 
         @ExceptionHandler(HttpMessageNotReadableException.class)
         public ResponseEntity<ErrorResponseDTO> handleMalformedJson(
-                        HttpMessageNotReadableException ex,
-                        HttpServletRequest request) {
-                Map<String, String> details = new HashMap<>();
-                details.put("error", "El JSON enviado está mal formado o incompleto");
-                details.put(
-                                "detalle",
-                                "Verifica la sintaxis, tipos de datos y que no existan valores vacíos");
+                HttpMessageNotReadableException ex,
+                HttpServletRequest request) {
 
-                return buildErrorResponse(
-                                HttpStatus.BAD_REQUEST,
-                                "JSON Mal Formado",
-                                details,
-                                request.getRequestURI());
+            Throwable cause = ex.getCause();
+            while (cause != null) {
+                if (cause instanceof IllegalArgumentException iae) {
+                    Map<String, String> details = new HashMap<>();
+                    details.put("error", iae.getMessage());
+
+                    return buildErrorResponse(
+                            HttpStatus.BAD_REQUEST,
+                            "Valor inválido",
+                            details,
+                            request.getRequestURI()
+                    );
+                }
+                cause = cause.getCause();
+            }
+
+            // fallback: JSON realmente mal formado
+            Map<String, String> details = new HashMap<>();
+            details.put("error", "El JSON enviado está mal formado o incompleto");
+            details.put(
+                    "detalle",
+                    "Verifica la sintaxis, tipos de datos y que no existan valores vacíos");
+
+            return buildErrorResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "JSON Mal Formado",
+                    details,
+                    request.getRequestURI());
         }
 
-        @ExceptionHandler(ExternalServiceException.class)
+    @ExceptionHandler(ExternalServiceException.class)
         public ResponseEntity<ErrorResponseDTO> handleExternalServiceError(
                         ExternalServiceException ex,
                         HttpServletRequest request) {
@@ -127,6 +145,22 @@ public class GlobalExceptionHandler {
                                 "Error en Servicio ML",
                                 details,
                                 request.getRequestURI());
+        }
+
+        @ExceptionHandler(IllegalArgumentException.class)
+        public ResponseEntity<ErrorResponseDTO> handleIllegalArgumentException(
+                IllegalArgumentException ex,
+                HttpServletRequest request) {
+
+            Map<String, String> details = new HashMap<>();
+            details.put("error", ex.getMessage());
+
+            return buildErrorResponse(
+                    HttpStatus.BAD_REQUEST,
+                    "Valor inválido",
+                    details,
+                    request.getRequestURI()
+            );
         }
 
         @ExceptionHandler(Exception.class)
