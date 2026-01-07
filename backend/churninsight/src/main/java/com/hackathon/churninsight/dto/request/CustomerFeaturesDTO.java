@@ -1,20 +1,17 @@
 package com.hackathon.churninsight.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.hackathon.churninsight.domain.enums.PaymentMethod;
+import com.hackathon.churninsight.domain.enums.SubscriptionType;
 import jakarta.validation.constraints.*;
 
 public record CustomerFeaturesDTO(
-        @NotBlank(message = "El tipo de suscripción es obligatorio")
-        @Pattern(
-                regexp = "^(Basic|Standard|Premium)$",
-                message = "Solo se permite: Basic, Standard o Premium"
-        )
+        @NotNull(message = "El tipo de suscripción es obligatorio")
         @JsonProperty("subscription_type")
-        String subscriptionType,
+        SubscriptionType subscriptionType,
 
         @NotNull (message = "Las horas vistas son obligatorias")
         @DecimalMin(value = "0.0", message = "Las horas vistas deben ser mayores a 0")
-
         @JsonProperty("watch_hours")
         Double watchHours,
 
@@ -39,24 +36,14 @@ public record CustomerFeaturesDTO(
         @JsonProperty("avg_watch_time_per_day")
         Double avgWatchTimePerDay,
 
-        @NotBlank(message = "El método de pago es obligatorio")
-        @Pattern(
-                regexp = "^(Credit Card|Debit Card|PayPal|Gift Card|Crypto)$",
-                message = "Método de pago inválido"
-        )
+        @NotNull(message = "El método de pago es obligatorio")
         @JsonProperty("payment_method")
-        String paymentMethod
+        PaymentMethod paymentMethod
 ) {
     // Validación cruzada Plan vs Precio
     @AssertTrue(message = "La tarifa mensual no coincide con el plan seleccionado")
     private boolean isPlanPriceConsistent() {
         if (subscriptionType == null || monthlyFee == null) return true;
-
-        return switch (subscriptionType) {
-            case "Basic" -> Math.abs(monthlyFee - 8.99) < 0.01;
-            case "Standard" -> Math.abs(monthlyFee - 13.99) < 0.01;
-            case "Premium" -> Math.abs(monthlyFee - 17.99) < 0.01;
-            default -> false;
-        };
+        return Math.abs(monthlyFee - subscriptionType.getPrice()) < 0.01;
     }
 }
