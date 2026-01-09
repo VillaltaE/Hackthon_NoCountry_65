@@ -25,7 +25,7 @@ public class PredictController {
     }
 
     @PostMapping
-    public ResponseEntity<SuccessResponseDTO<PredictResponseDTO>> predict(
+    public ResponseEntity<SuccessResponseDTO<Object>> predict(
             @Valid @RequestBody PredictRequestDTO request,
             HttpServletRequest httpRequest) {
 
@@ -33,15 +33,23 @@ public class PredictController {
 
         PredictResponseDTO prediction = predictService.predict(request);
 
-        log.info("Predicción generada exitosamente para cliente: {} - Resultado: {}",
-                request.customerId(),
-                prediction.prediction().label());
+        String label = prediction.prediction().label();
+        String prevision = label.equals("will_churn") ? "Va a cancelar" : "Va a continuar";
 
-        SuccessResponseDTO<PredictResponseDTO> response = new SuccessResponseDTO<>(
+        // Armamos un "data" extendido (mantiene lo técnico + agrega lo humano)
+        var data = new java.util.LinkedHashMap<String, Object>();
+        data.put("customer_id", prediction.customerId());
+        data.put("prediction", prediction.prediction());
+        data.put("prevision", prevision);
+
+        log.info("Predicción generada exitosamente para cliente: {} - Resultado: {}",
+                request.customerId(), label);
+
+        SuccessResponseDTO<Object> response = new SuccessResponseDTO<>(
                 LocalDateTime.now(),
                 HttpStatus.OK.value(),
                 "Predicción generada correctamente",
-                prediction,
+                data,
                 httpRequest.getRequestURI());
 
         return ResponseEntity.ok(response);
