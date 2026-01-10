@@ -1,5 +1,9 @@
 package com.hackathon.churninsight.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -21,6 +25,10 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/health")
 @Slf4j
+@Tag(
+        name = "Health",
+        description = "Monitoreo del estado del backend y sus dependencias"
+)
 public class HealthController {
 
     private final WebClient webClient;
@@ -37,6 +45,16 @@ public class HealthController {
      *
      * @return Estado del servicio con timestamp
      */
+    @Operation(
+            summary = "Health check básico",
+            description = "Verifica si el backend está operativo"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Servicio operativo"
+            )
+    })
     @GetMapping
     public ResponseEntity<Map<String, Object>> health() {
         log.debug("Health check solicitado");
@@ -55,6 +73,23 @@ public class HealthController {
      *
      * @return Estado detallado incluyendo verificación de dependencias
      */
+    @Operation(
+            summary = "Health check detallado",
+            description = """
+                Verifica el estado del backend y la conectividad
+                con el servicio externo de Machine Learning.
+                """
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "Servicio operativo y dependencias disponibles"
+            ),
+            @ApiResponse(
+                    responseCode = "503",
+                    description = "Servicio operativo pero dependencia ML no disponible"
+            )
+    })
     @GetMapping("/detailed")
     public ResponseEntity<Map<String, Object>> detailedHealth() {
         log.debug("Health check detallado solicitado");
