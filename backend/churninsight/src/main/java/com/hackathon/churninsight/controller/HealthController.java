@@ -1,16 +1,10 @@
 package com.hackathon.churninsight.controller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Duration;
@@ -25,10 +19,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/health")
 @Slf4j
-@Tag(
-        name = "Health",
-        description = "Monitoreo del estado del backend y sus dependencias"
-)
 public class HealthController {
 
     private final WebClient webClient;
@@ -41,88 +31,63 @@ public class HealthController {
     }
 
     /**
-     * Health check básico del servicio.
-     *
-     * @return Estado del servicio con timestamp
+     * ✅ Health PRO: backend valida conectividad con ML (server-to-server).
+     * Este es el endpoint que debe consumir el FRONTEND.
      */
-    @Operation(
-            summary = "Health check básico",
-            description = "Verifica si el backend está operativo"
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Servicio operativo"
-            )
-    })
     @GetMapping
     public ResponseEntity<Map<String, Object>> health() {
-        log.debug("Health check solicitado");
+        log.debug("Health PRO solicitado (/api/health)");
 
-        Map<String, Object> health = new HashMap<>();
-        health.put("status", "UP");
-        health.put("timestamp", LocalDateTime.now());
-        health.put("service", "ChurnInsight Backend");
-        health.put("version", "1.0.0");
+        Map<String, Object> health = baseInfo();
 
-        return ResponseEntity.ok(health);
-    }
-
-    /**
-     * Health check detallado que verifica conectividad con el servicio ML.
-     *
-     * @return Estado detallado incluyendo verificación de dependencias
-     */
-    @Operation(
-            summary = "Health check detallado",
-            description = """
-                Verifica el estado del backend y la conectividad
-                con el servicio externo de Machine Learning.
-                """
-    )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200",
-                    description = "Servicio operativo y dependencias disponibles"
-            ),
-            @ApiResponse(
-                    responseCode = "503",
-                    description = "Servicio operativo pero dependencia ML no disponible"
-            )
-    })
-    @GetMapping("/detailed")
-    public ResponseEntity<Map<String, Object>> detailedHealth() {
-        log.debug("Health check detallado solicitado");
-
-        Map<String, Object> health = new HashMap<>();
-        health.put("timestamp", LocalDateTime.now());
-        health.put("service", "ChurnInsight Backend");
-        health.put("version", "1.0.0");
-
-        // Verificar conectividad con servicio ML
-        boolean mlServiceAvailable = checkMlServiceHealth();
+        boolean mlUp = checkMlServiceHealth();
 
         Map<String, Object> dependencies = new HashMap<>();
         dependencies.put("ml-service", Map.of(
                 "url", mlServiceBaseUrl,
-                "status", mlServiceAvailable ? "UP" : "DOWN"));
+                "status", mlUp ? "UP" : "DOWN"
+        ));
 
         health.put("dependencies", dependencies);
-        health.put("status", mlServiceAvailable ? "UP" : "DEGRADED");
+        health.put("backend", "UP");
+        health.put("ml", mlUp ? "UP" : "DOWN");
+        health.put("status", mlUp ? "UP" : "DEGRADED");
 
-        HttpStatus status = mlServiceAvailable ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
+        HttpStatus status = mlUp ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE;
         return ResponseEntity.status(status).body(health);
     }
 
     /**
+     * Health básico (sin validar dependencias).
+     * Útil para checks rápidos o uptime.
+     */
+    @GetMapping("/basic")
+    public ResponseEntity<Map<String, Object>> basic() {
+        log.debug("Health básico solicitado (/api/health/basic)");
+
+        Map<String, Object> health = baseInfo();
+        health.put("backend", "UP");
+        health.put("status", "UP");
+
+        return ResponseEntity.ok(health);
+    }
+
+    private Map<String, Object> baseInfo() {
+        Map<String, Object> health = new HashMap<>();
+        health.put("timestamp", LocalDateTime.now());
+        health.put("service", "ChurnInsight Backend");
+        health.put("version", "1.0.0");
+        return health;
+    }
+
+    /**
      * Verifica si el servicio ML está disponible.
-     *
-     * @return true si el servicio responde, false en caso contrario
+     * OJO: WebClient ya tiene baseUrl configurada => usamos uri("/health").
      */
     private boolean checkMlServiceHealth() {
         try {
             webClient.get()
-                    .uri(mlServiceBaseUrl + "/health")
+                    .uri("/health")
                     .retrieve()
                     .toBodilessEntity()
                     .timeout(Duration.ofSeconds(2))
