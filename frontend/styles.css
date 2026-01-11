@@ -161,3 +161,7 @@ code{ color: #FF78B9; }
 .small.text-secondary {
   color: rgba(210, 215, 225, 0.70);
 }
+
+#btnClear {
+  white-space: nowrap;
+}

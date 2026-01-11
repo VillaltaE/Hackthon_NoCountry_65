@@ -30,6 +30,45 @@ function setResultEmpty(isEmpty) {
   content.classList.toggle("d-none", isEmpty);
 }
 
+function resetResultUI() {
+  const ids = [
+    "outCustomer",
+    "outPrevision",
+    "outProb",
+    "outLabel",
+    "riskText",
+    "riskHint",
+    "debugInfo",
+  ];
+  ids.forEach((id) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = "—";
+  });
+
+  const bar = document.getElementById("riskBar");
+  if (bar) bar.style.width = "0%";
+}
+
+function clearAll() {
+  // ocultar alert si existe
+  const alertBox = document.getElementById("alertBox");
+  if (alertBox) alertBox.classList.add("d-none");
+
+  // reset form
+  const form = document.getElementById("predictForm");
+  if (form) {
+    form.reset();
+    form.classList.remove("was-validated");
+  }
+
+  // reset result
+  resetResultUI();
+  setResultEmpty(true);
+
+  // foco al primer campo
+  document.getElementById("customer_id")?.focus();
+}
+
 function formatProb(p) {
   if (p === undefined || p === null || Number.isNaN(Number(p))) return "—";
   const n = Number(p);
@@ -233,11 +272,16 @@ async function predict() {
 document.addEventListener("DOMContentLoaded", () => {
   // ✅ Estado inicial del panel de Resultado
   setResultEmpty(true);
+  setResultEmpty(true);
+  resetResultUI();
+
   $("badgeEndpoint").textContent = `Endpoint: POST ${BACKEND_URL}`;
   $("endpointLabel").textContent = BACKEND_URL.replace(
     "http://localhost:8080",
     ""
   );
+
+  document.getElementById("btnClear")?.addEventListener("click", clearAll);
 
   pingHealth();
   setInterval(pingHealth, 5000);
