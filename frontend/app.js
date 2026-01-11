@@ -1,5 +1,6 @@
 const root = document.body;
-const BACKEND_URL = root.dataset.backendUrl || "http://localhost:8080/api/predict";
+const BACKEND_URL =
+  root.dataset.backendUrl || "http://localhost:8080/api/predict";
 const HEALTH_URL = root.dataset.healthUrl || "http://localhost:8080/api/health";
 
 const $ = (id) => document.getElementById(id);
@@ -18,6 +19,15 @@ function hideAlert() {
 function setLoading(isLoading) {
   $("btnPredict").disabled = isLoading;
   $("btnSpinner").classList.toggle("d-none", !isLoading);
+}
+
+function setResultEmpty(isEmpty) {
+  const empty = document.getElementById("resultEmpty");
+  const content = document.getElementById("resultContent");
+  if (!empty || !content) return;
+
+  empty.classList.toggle("d-none", !isEmpty);
+  content.classList.toggle("d-none", isEmpty);
 }
 
 function formatProb(p) {
@@ -42,20 +52,32 @@ async function pingHealth() {
     // esperado: { status, backend, ml, ... }
 
     if (h.backend === "UP") {
-      $("status-backend").innerHTML = `<i class="bi bi-circle-fill text-success"></i> Backend: OK`;
+      $(
+        "status-backend"
+      ).innerHTML = `<i class="bi bi-circle-fill text-success"></i> Backend: OK`;
     } else {
-      $("status-backend").innerHTML = `<i class="bi bi-circle-fill text-danger"></i> Backend: OFF`;
+      $(
+        "status-backend"
+      ).innerHTML = `<i class="bi bi-circle-fill text-danger"></i> Backend: OFF`;
     }
 
     if (h.ml === "UP") {
-      $("status-ml").innerHTML = `<i class="bi bi-circle-fill text-success"></i> ML: OK`;
+      $(
+        "status-ml"
+      ).innerHTML = `<i class="bi bi-circle-fill text-success"></i> ML: OK`;
     } else {
       // DEGRADED: backend UP pero ML DOWN
-      $("status-ml").innerHTML = `<i class="bi bi-circle-fill text-danger"></i> ML: OFF`;
+      $(
+        "status-ml"
+      ).innerHTML = `<i class="bi bi-circle-fill text-danger"></i> ML: OFF`;
     }
   } catch {
-    $("status-backend").innerHTML = `<i class="bi bi-circle-fill text-danger"></i> Backend: OFF`;
-    $("status-ml").innerHTML = `<i class="bi bi-circle-fill text-danger"></i> ML: ?`;
+    $(
+      "status-backend"
+    ).innerHTML = `<i class="bi bi-circle-fill text-danger"></i> Backend: OFF`;
+    $(
+      "status-ml"
+    ).innerHTML = `<i class="bi bi-circle-fill text-danger"></i> ML: ?`;
   }
 }
 
@@ -104,7 +126,12 @@ function updateRiskMeter(probability) {
   txt.textContent = "—";
   hint.textContent = "—";
 
-  if (probability === undefined || probability === null || Number.isNaN(Number(probability))) return;
+  if (
+    probability === undefined ||
+    probability === null ||
+    Number.isNaN(Number(probability))
+  )
+    return;
 
   const churnRisk = Math.max(0, Math.min(1, Number(probability)));
   const churnPct = Math.round(churnRisk * 100);
@@ -112,18 +139,29 @@ function updateRiskMeter(probability) {
 
   let level = "Bajo";
   let klass = "bg-success";
-  if (churnRisk >= 0.70) { level = "Alto"; klass = "bg-danger"; }
-  else if (churnRisk >= 0.35) { level = "Medio"; klass = "bg-warning"; }
+  if (churnRisk >= 0.7) {
+    level = "Alto";
+    klass = "bg-danger";
+  } else if (churnRisk >= 0.35) {
+    level = "Medio";
+    klass = "bg-warning";
+  }
 
   bar.classList.add(klass);
   txt.textContent = `${level} (${churnPct}%)`;
 
-  if (level === "Bajo") hint.textContent = "Riesgo bajo de abandono según el modelo.";
-  if (level === "Medio") hint.textContent = "Riesgo medio: conviene monitorear y aplicar retención ligera.";
-  if (level === "Alto") hint.textContent = "Riesgo alto: recomendar acción inmediata de retención.";
+  if (level === "Bajo")
+    hint.textContent = "Riesgo bajo de abandono según el modelo.";
+  if (level === "Medio")
+    hint.textContent =
+      "Riesgo medio: conviene monitorear y aplicar retención ligera.";
+  if (level === "Alto")
+    hint.textContent = "Riesgo alto: recomendar acción inmediata de retención.";
 }
 
 function renderResult(apiResponse) {
+  // ✅ Mostrar contenido y ocultar estado vacío
+  setResultEmpty(false);
   const data = apiResponse.data ?? {};
   const label = data.prediction?.label;
   const prob = data.prediction?.probability;
@@ -132,7 +170,9 @@ function renderResult(apiResponse) {
   $("outLabel").textContent = label ?? "—";
   $("outProb").textContent = formatProb(prob);
   $("outPrevision").textContent = data.prevision ?? labelToPrevision(label);
-  $("debugInfo").textContent = `Status: ${apiResponse.status} | Path: ${apiResponse.path}`;
+  $(
+    "debugInfo"
+  ).textContent = `Status: ${apiResponse.status} | Path: ${apiResponse.path}`;
 
   updateRiskMeter(prob);
 }
@@ -147,7 +187,10 @@ async function predict() {
   hideAlert();
 
   if (!validateForm()) {
-    showAlert("danger", "Revisa los campos marcados. Hay valores faltantes o inválidos.");
+    showAlert(
+      "danger",
+      "Revisa los campos marcados. Hay valores faltantes o inválidos."
+    );
     return;
   }
 
@@ -166,7 +209,12 @@ async function predict() {
 
     if (!r.ok) {
       const details = JSON.stringify(json.details ?? json, null, 2);
-      showAlert("danger", `Error (${json.status ?? r.status}): ${json.error ?? "Bad Request"}. Detalles: ${details}`);
+      showAlert(
+        "danger",
+        `Error (${json.status ?? r.status}): ${
+          json.error ?? "Bad Request"
+        }. Detalles: ${details}`
+      );
       return;
     }
 
@@ -183,8 +231,13 @@ async function predict() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  // ✅ Estado inicial del panel de Resultado
+  setResultEmpty(true);
   $("badgeEndpoint").textContent = `Endpoint: POST ${BACKEND_URL}`;
-  $("endpointLabel").textContent = BACKEND_URL.replace("http://localhost:8080", "");
+  $("endpointLabel").textContent = BACKEND_URL.replace(
+    "http://localhost:8080",
+    ""
+  );
 
   pingHealth();
   setInterval(pingHealth, 5000);
