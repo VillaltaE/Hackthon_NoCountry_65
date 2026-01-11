@@ -48,16 +48,77 @@ public class PredictController {
                     description = "Predicción generada correctamente",
                     content = @Content(
                             mediaType = "application/json",
-                            schema = @Schema(implementation = SuccessResponseDTO.class)
+                            schema = @Schema(implementation = SuccessResponseDTO.class),
+                            examples = {
+                                    @io.swagger.v3.oas.annotations.media.ExampleObject(
+                                            name = "Predicción exitosa",
+                                            value = """
+                                        {
+                                          "timestamp": "2026-01-12T15:45:30",
+                                          "status": 200,
+                                          "message": "Predicción generada correctamente",
+                                          "data": {
+                                            "customer_id": "user-123",
+                                            "prediction": {
+                                              "label": "will_churn",
+                                              "probability": 0.82
+                                            },
+                                            "prevision": "Va a cancelar"
+                                          },
+                                          "path": "/api/predict"
+                                        }
+                                        """
+                                    )
+                            }
                     )
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Solicitud inválida (error de validación o enums inválidos)"
+                    description = "Solicitud inválida (error de validación o enums inválidos)",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = com.hackathon.churninsight.dto.response.ErrorResponseDTO.class),
+                            examples = {
+                                    @io.swagger.v3.oas.annotations.media.ExampleObject(
+                                            name = "Error de validación",
+                                            value = """
+                                        {
+                                          "timestamp": "2026-01-12T15:45:30",
+                                          "status": 400,
+                                          "error": "Error de Validación",
+                                          "details": {
+                                            "features.numberOfProfiles": "el valor debe estar entre 1 y 5"
+                                          },
+                                          "path": "/api/predict"
+                                        }
+                                        """
+                                    )
+                            }
+                    )
             ),
             @ApiResponse(
                     responseCode = "503",
-                    description = "Servicio de Machine Learning no disponible"
+                    description = "Servicio de Machine Learning no disponible",
+                    content = @Content(
+                            mediaType = "application/json",
+                            schema = @Schema(implementation = com.hackathon.churninsight.dto.response.ErrorResponseDTO.class),
+                            examples = {
+                                    @io.swagger.v3.oas.annotations.media.ExampleObject(
+                                            name = "Servicio ML caído",
+                                            value = """
+                                        {
+                                          "timestamp": "2026-01-12T15:45:30",
+                                          "status": 503,
+                                          "error": "Servicio ML no disponible",
+                                          "details": {
+                                            "ml_service": "timeout al intentar obtener predicción"
+                                          },
+                                          "path": "/api/predict"
+                                        }
+                                        """
+                                    )
+                            }
+                    )
             )
     })
     @PostMapping
