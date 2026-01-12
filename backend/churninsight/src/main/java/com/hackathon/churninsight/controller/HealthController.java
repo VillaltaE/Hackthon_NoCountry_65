@@ -1,5 +1,8 @@
 package com.hackathon.churninsight.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -19,6 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/health")
 @Slf4j
+@Tag(name = "Health", description = "Endpoints para monitoreo del estado del backend y servicios dependientes")
 public class HealthController {
 
     private final WebClient webClient;
@@ -34,6 +38,14 @@ public class HealthController {
      * ✅ Health PRO: backend valida conectividad con ML (server-to-server).
      * Este es el endpoint que debe consumir el FRONTEND.
      */
+    @Operation(
+            summary = "Health PRO",
+            description = "Valida el estado del backend y la conectividad con el servicio de Machine Learning.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Backend y ML operativos"),
+                    @ApiResponse(responseCode = "503", description = "ML caído o degradado")
+            }
+    )
     @GetMapping
     public ResponseEntity<Map<String, Object>> health() {
         log.debug("Health PRO solicitado (/api/health)");
@@ -61,6 +73,13 @@ public class HealthController {
      * Health básico (sin validar dependencias).
      * Útil para checks rápidos o uptime.
      */
+    @Operation(
+            summary = "Health básico",
+            description = "Retorna el estado del backend sin validar servicios externos.",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Backend operativo")
+            }
+    )
     @GetMapping("/basic")
     public ResponseEntity<Map<String, Object>> basic() {
         log.debug("Health básico solicitado (/api/health/basic)");
