@@ -25,7 +25,7 @@ El dataset consta de 14 columnas y 5000 filas.
  - churned: 1 si y 0 no
  - payment_method: Credit Card, Debit Card, Crypto, Gift Card y Paypal
  - number_of_profiles: Entre 1 y 5
- - avg_watch_time_per_day: minutos
+ - avg_watch_time_per_day: horas (watch_hours/last_login_days + 1)
  - favorite_genre: Action, Sci-Fi, Drama,Horror,Romance, Comedy y Documentary
 
 
