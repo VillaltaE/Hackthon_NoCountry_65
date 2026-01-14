@@ -29,9 +29,6 @@ El dataset consta de 14 columnas y 5000 filas.
  - favorite_genre: Action, Sci-Fi, Drama,Horror,Romance, Comedy y Documentary
 
 
-
-
-
 ### 🎯 Problema que resuelve
 
 La pérdida de clientes impacta directamente en los ingresos de las empresas de suscripción.
@@ -45,22 +42,34 @@ Detectar clientes con alta probabilidad de churn permite:
 
 ## EDA
 
-- matplotlib.pyplot
-- seaborn 
-- numpy
-- pandas
+- Matplotlib.pyplot.
+- Seaborn. 
+- Numpy.
+- Pandas.
+- StatsModels.
 
 ## Modelo predictivo
 
--librerias de sklearn
-
+- Librerias de scikitlearn.
+- Librería Statsmodels.
 
 ## Análisis estadístico
 
-El análisis estadístico con Chi Cuadrado y la V de Cramer se usa para determinar
+El análisis estadístico con ***Chi Cuadrado*** y la ***V de Cramer*** se usa para determinar
 si hay asociación significativa entre dos variables categóricas y qué tan fuerte
 es esa relación.
+
+El ***coeficiente de correlación de Pearson*** utilizado con el objetivo de medir la dependencia lineal entre dos variables continuas.
+
+Análisis de multicolinealidad a través del método ***Factor de Inflación de la Varianza (VIF)*** entre las variables del modelo de Regresión Logística para evaluar la independiencia de las mismas. 
 
 ## Modelo seleccionado
 
 Se hicieron pruebas con los modelos Random Forest y Logistic Regression, ambos modelos funcionan, sin embargo, se seleccionó el modelo de Logistic Regression porque es más sencillo de explicar a los tomadores de decision, por medio de una ecuación.
+
+Aplicando el modelo de Logistic Regression a nuestro problema , la probabilidad de cancelación del servicio de Netflix es la siguiente:
+
+$$P(Y=1|X) = \frac{1}{1 + e^{-(\beta_0 + \beta_1X_1 + \beta_2X_2 + \dots + \beta_n X_n)}}$$
+
+donde  β0  es el intercepto de la regresión y  β1 ,  β2  ...  βn  son los coeficientes de las variables predictoras.
+
