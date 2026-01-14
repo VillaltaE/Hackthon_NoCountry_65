@@ -63,5 +63,4 @@ es esa relación.
 
 ## Modelo seleccionado
 
-Se seleccionó el modelo de LogisticRegression porque presenta una precisión de 0.89, se hizo prueba con el
-modelo RandomForest pero este modelo sobreajustaba los datos (precisión 0.99)
+Se hicieron pruebas con los modelos Random Forest y Logistic Regression, ambos modelos funcionan, sin embargo, se seleccionó el modelo de Logistic Regression porque es más sencillo de explicar a los tomadores de decision, por medio de una ecuación.
