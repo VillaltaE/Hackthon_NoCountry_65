@@ -13,11 +13,16 @@ import reactor.core.publisher.Mono;
 
 import java.time.Duration;
 
+import com.hackathon.churninsight.domain.PredictionHistory;
+import com.hackathon.churninsight.repository.PredictionHistoryRepository;
+import java.time.LocalDateTime;
+
 @Service
 @Slf4j
 public class PredictServiceImpl implements PredictService {
 
         private final WebClient webClient;
+        private final PredictionHistoryRepository predictionHistoryRepository;
 
         @Value("${ml.service.timeout}")
         private int timeout;
@@ -25,8 +30,9 @@ public class PredictServiceImpl implements PredictService {
         @Value("${ml.service.retry.max-attempts}")
         private int maxRetryAttempts;
 
-        public PredictServiceImpl(WebClient webClient) {
+        public PredictServiceImpl(WebClient webClient, PredictionHistoryRepository predictionHistoryRepository) {
                 this.webClient = webClient;
+                this.predictionHistoryRepository = predictionHistoryRepository;
         }
 
         @Override
@@ -76,6 +82,29 @@ public class PredictServiceImpl implements PredictService {
                                                 request.customerId(),
                                                 response.prediction().label(),
                                                 response.prediction().probability());
+                                // Guardar el historial de predicción
+                                PredictionHistory history = PredictionHistory.builder()
+                                                .customerId(request.customerId())
+                                                .subscriptionType(request.features().subscriptionType().name())
+                                                .paymentMethod(request.features().paymentMethod().name())
+                                                .monthlyFee(request.features().monthlyFee())
+                                                .watchHours(request.features().watchHours())
+                                                .lastLoginDays(request.features().lastLoginDays())
+                                                .numberOfProfiles(request.features().numberOfProfiles())
+                                                .avgWatchTimePerDay(request.features().avgWatchTimePerDay())
+
+                                                // 🔹 Resultado del modelo
+                                                .label(response.prediction().label()) // will_churn
+
+                                                // 🔹 Etiqueta de negocio
+                                                .predictionLabel(mapRiskLabel(response.prediction().probability()))
+
+                                                .probability(response.prediction().probability())
+                                                .createdAt(LocalDateTime.now())
+                                                .build();
+
+                                predictionHistoryRepository.save(history);
+
                         } else {
                                 log.warn("Respuesta nula recibida del servicio ML para cliente {}",
                                                 request.customerId());
@@ -94,4 +123,15 @@ public class PredictServiceImpl implements PredictService {
                                         "No se pudo obtener la predicción del servicio ML: " + e.getMessage(), e);
                 }
         }
+
+        private String mapRiskLabel(double probability) {
+                if (probability >= 0.8) {
+                        return "Riesgo alto";
+                } else if (probability >= 0.5) {
+                        return "Riesgo medio";
+                } else {
+                        return "Riesgo bajo";
+                }
+        }
+
 }
