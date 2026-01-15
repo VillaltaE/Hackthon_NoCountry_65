@@ -131,7 +131,15 @@ public class PredictController {
         PredictResponseDTO prediction = predictService.predict(request);
 
         String label = prediction.prediction().label();
-        String prevision = label.equals("will_churn") ? "Va a cancelar" : "Va a continuar";
+        String prevision;
+
+        switch (label) {
+            case "will_churn" -> prevision = "Va a cancelar";
+            case "will_continue" -> prevision = "Va a continuar";
+            default -> throw new IllegalStateException(
+                    "Label de predicción no soportado: " + label
+            );
+        }
 
         // Armamos un "data" extendido (mantiene lo técnico + agrega lo humano)
         var data = new java.util.LinkedHashMap<String, Object>();
