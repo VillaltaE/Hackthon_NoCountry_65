@@ -9,7 +9,9 @@ import java.util.List;
 @Repository
 public interface PredictionHistoryRepository extends JpaRepository<PredictionHistory, Long> {
 
+    // Trae las últimas 20 predicciones
     List<PredictionHistory> findTop20ByOrderByCreatedAtDesc();
 
+    // Trae las últimas 20 predicciones de un cliente específico
     List<PredictionHistory> findTop20ByCustomerIdOrderByCreatedAtDesc(String customerId);
 }
