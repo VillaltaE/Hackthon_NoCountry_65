@@ -15,11 +15,6 @@ public interface PredictService {
      *
      * @param request Datos del cliente y sus características
      * @return Respuesta con la predicción de churn y probabilidad
-     * @throws com.hackathon.churninsight.exception.ExternalServiceException si hay
-     *                                                                       error
-     *                                                                       en el
-     *                                                                       servicio
-     *                                                                       ML
-     */
+     * @throws com.hackathon.churninsight.exception.ExternalServiceException si hay error en el servicioML*/
     PredictResponseDTO predict(PredictRequestDTO request);
 }
