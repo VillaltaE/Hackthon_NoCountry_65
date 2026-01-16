@@ -156,15 +156,17 @@ function labelToPrevision(label) {
 }
 
 function updateRiskMeter(probability) {
-  const bar = $("riskBar");
-  const txt = $("riskText");
-  const hint = $("riskHint");
+  const bar = document.getElementById("riskBar");
+  const txt = document.getElementById("riskText");
+  const hint = document.getElementById("riskHint");
 
+  // Resetear el estado de la barra
   bar.style.width = "0%";
   bar.className = "progress-bar";
   txt.textContent = "—";
   hint.textContent = "—";
 
+  // Validar la probabilidad
   if (
     probability === undefined ||
     probability === null ||
@@ -178,6 +180,8 @@ function updateRiskMeter(probability) {
 
   let level = "Bajo";
   let klass = "bg-success";
+
+  // Definir los niveles de riesgo y los colores de la barra
   if (churnRisk >= 0.7) {
     level = "Alto";
     klass = "bg-danger";
@@ -186,9 +190,11 @@ function updateRiskMeter(probability) {
     klass = "bg-warning";
   }
 
+  // Actualizar la clase de la barra
   bar.classList.add(klass);
   txt.textContent = `${level} (${churnPct}%)`;
 
+  // Mensajes adicionales según el nivel de riesgo
   if (level === "Bajo")
     hint.textContent = "Riesgo bajo de abandono según el modelo.";
   if (level === "Medio")
