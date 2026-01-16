@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -36,6 +37,18 @@ public class PredictionHistoryServiceImpl implements PredictionHistoryService {
         PageRequest pageRequest = PageRequest.of(page, size);
         // Recuperamos la página de resultados y mapeamos a DTO
         Page<PredictionHistory> historyPage = repo.findByCustomerId(customerId, pageRequest);
+        return historyPage.stream()
+                .map(this::toDto)
+                .toList();
+    }
+
+    // Método para filtrar por fecha
+    @Override
+    public List<PredictionHistoryDTO> byDateRange(LocalDateTime startDate, LocalDateTime endDate, int page, int size) {
+        // Usamos PageRequest para la paginación
+        PageRequest pageRequest = PageRequest.of(page, size);
+        // Recuperamos la página de resultados filtrada por fecha
+        Page<PredictionHistory> historyPage = repo.findByCreatedAtBetween(startDate, endDate, pageRequest);
         return historyPage.stream()
                 .map(this::toDto)
                 .toList();
