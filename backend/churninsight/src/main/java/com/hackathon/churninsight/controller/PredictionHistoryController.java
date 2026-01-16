@@ -17,13 +17,16 @@ public class PredictionHistoryController {
     }
 
     @GetMapping
-    public List<PredictionHistoryDTO> latest() {
-        return service.latest();
+    public List<PredictionHistoryDTO> latest(@RequestParam(defaultValue = "0") int page, 
+                                              @RequestParam(defaultValue = "20") int size) {
+        return service.latest(page, size);
     }
 
     @GetMapping("/{customerId}")
-    public List<PredictionHistoryDTO> byCustomer(@PathVariable String customerId) {
-        return service.byCustomer(customerId);
+    public List<PredictionHistoryDTO> byCustomer(@PathVariable String customerId, 
+                                                  @RequestParam(defaultValue = "0") int page,
+                                                  @RequestParam(defaultValue = "20") int size) {
+        return service.byCustomer(customerId, page, size);
     }
 
     @DeleteMapping

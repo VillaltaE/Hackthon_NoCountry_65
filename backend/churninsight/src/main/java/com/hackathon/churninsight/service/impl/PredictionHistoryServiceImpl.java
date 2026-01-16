@@ -5,6 +5,8 @@ import com.hackathon.churninsight.dto.response.PredictionHistoryDTO;
 import com.hackathon.churninsight.repository.PredictionHistoryRepository;
 import com.hackathon.churninsight.service.PredictionHistoryService;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
 
@@ -18,15 +20,23 @@ public class PredictionHistoryServiceImpl implements PredictionHistoryService {
     }
 
     @Override
-    public List<PredictionHistoryDTO> latest() {
-        return repo.findTop20ByOrderByCreatedAtDesc().stream()
+    public List<PredictionHistoryDTO> latest(int page, int size) {
+        // Usamos PageRequest para la paginación
+        PageRequest pageRequest = PageRequest.of(page, size);
+        // Recuperamos la página de resultados y mapeamos a DTO
+        Page<PredictionHistory> historyPage = repo.findAll(pageRequest);
+        return historyPage.stream()
                 .map(this::toDto)
                 .toList();
     }
 
     @Override
-    public List<PredictionHistoryDTO> byCustomer(String customerId) {
-        return repo.findTop20ByCustomerIdOrderByCreatedAtDesc(customerId).stream()
+    public List<PredictionHistoryDTO> byCustomer(String customerId, int page, int size) {
+        // Usamos PageRequest para la paginación
+        PageRequest pageRequest = PageRequest.of(page, size);
+        // Recuperamos la página de resultados y mapeamos a DTO
+        Page<PredictionHistory> historyPage = repo.findByCustomerId(customerId, pageRequest);
+        return historyPage.stream()
                 .map(this::toDto)
                 .toList();
     }

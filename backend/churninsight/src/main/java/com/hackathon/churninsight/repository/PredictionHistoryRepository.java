@@ -3,15 +3,15 @@ package com.hackathon.churninsight.repository;
 import com.hackathon.churninsight.domain.PredictionHistory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Repository
 public interface PredictionHistoryRepository extends JpaRepository<PredictionHistory, Long> {
 
-    // Trae las últimas 20 predicciones
-    List<PredictionHistory> findTop20ByOrderByCreatedAtDesc();
+    // Método para obtener todas las predicciones con paginación
+    Page<PredictionHistory> findAll(Pageable pageable);
 
-    // Trae las últimas 20 predicciones de un cliente específico
-    List<PredictionHistory> findTop20ByCustomerIdOrderByCreatedAtDesc(String customerId);
+    // Método para obtener las predicciones de un cliente específico con paginación
+    Page<PredictionHistory> findByCustomerId(String customerId, Pageable pageable);
 }
