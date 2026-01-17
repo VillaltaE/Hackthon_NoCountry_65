@@ -407,9 +407,12 @@
                   <input class="form-control" type="date" id="historyEndDate" />
                 </div>
 
-                <div class="col-12 col-md-2 d-grid">
+                <div class="col-12 col-md-2 d-grid gap-2">
                   <button class="btn btn-primary" id="btnHistorySearch">
                     Buscar
+                  </button>
+                  <button class="btn btn-outline-light" id="btnHistoryExport">
+                    Exportar CSV
                   </button>
                 </div>
               </div>
@@ -424,8 +427,12 @@
                     <tr>
                       <th>Cliente</th>
                       <th>Fecha</th>
-                      <th>Predicción</th>
-                      <th>Prob.</th>
+                      <th>Riesgo</th>
+                      <th>Etiqueta</th>
+                      <th class="text-end">Prob.</th>
+                      <!-- Alineación a la derecha -->
+                      <th class="text-end">Acción</th>
+                      <!-- Alineación a la derecha -->
                     </tr>
                   </thead>
                   <tbody id="historyTbody"></tbody>
@@ -441,6 +448,25 @@
       </div>
       <!-- ========================================================= -->
     </main>
+
+    <!-- Modal Detalle Historial -->
+    <div class="modal fade" id="historyDetailModal" tabindex="-1">
+      <div
+        class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable"
+      >
+        <div class="modal-content bg-dark text-white">
+          <div class="modal-header border-secondary">
+            <h5 class="modal-title">Detalle de Predicción</h5>
+            <button
+              type="button"
+              class="btn-close btn-close-white"
+              data-bs-dismiss="modal"
+            ></button>
+          </div>
+          <div class="modal-body" id="historyDetailBody"></div>
+        </div>
+      </div>
+    </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./app.js"></script>

@@ -204,6 +204,8 @@ function updateRiskMeter(probability) {
     hint.textContent = "Riesgo alto: recomendar acción inmediata de retención.";
 }
 
+let LAST_HISTORY = [];
+
 function renderResult(apiResponse) {
   // ✅ Mostrar contenido y ocultar estado vacío
   setResultEmpty(false);
@@ -225,9 +227,10 @@ function renderResult(apiResponse) {
 // ================= HISTORIAL =================
 
 async function loadHistory() {
-  const customerId = document.getElementById("historyCustomerId")?.value?.trim() || "";
+  const customerId =
+    document.getElementById("historyCustomerId")?.value?.trim() || "";
   const start = document.getElementById("historyStartDate")?.value || ""; // YYYY-MM-DD
-  const end = document.getElementById("historyEndDate")?.value || "";     // YYYY-MM-DD
+  const end = document.getElementById("historyEndDate")?.value || ""; // YYYY-MM-DD
 
   const page = 0;
   const size = 20;
@@ -254,32 +257,48 @@ async function loadHistory() {
       console.log("[HISTORY] usando FILTER (fechas)", url);
 
       const res = await fetch(url);
-      if (!res.ok) throw new Error("Error al consultar historial (filtro por fecha)");
+      if (!res.ok)
+        throw new Error("Error al consultar historial (filtro por fecha)");
 
       const data = await res.json();
 
       // Por si el backend devuelve Page<T> o lista directa
-      list = Array.isArray(data?.content) ? data.content : Array.isArray(data) ? data : [];
+      list = Array.isArray(data?.content)
+        ? data.content
+        : Array.isArray(data)
+        ? data
+        : [];
 
       // Si además hay customerId, filtramos en frontend (porque no hay endpoint combinado)
       if (customerId) {
         const cid = customerId.toLowerCase();
-        list = list.filter((h) => String(h.customerId || "").toLowerCase().includes(cid));
+        list = list.filter((h) =>
+          String(h.customerId || "")
+            .toLowerCase()
+            .includes(cid)
+        );
       }
     }
 
     // Caso B: Solo cliente
     else if (customerId) {
       const params = new URLSearchParams({ page, size });
-      url = `http://localhost:8080/api/history/${encodeURIComponent(customerId)}?${params.toString()}`;
+      url = `http://localhost:8080/api/history/${encodeURIComponent(
+        customerId
+      )}?${params.toString()}`;
 
       console.log("[HISTORY] usando POR CLIENTE", url);
 
       const res = await fetch(url);
-      if (!res.ok) throw new Error("Error al consultar historial (por cliente)");
+      if (!res.ok)
+        throw new Error("Error al consultar historial (por cliente)");
 
       const data = await res.json();
-      list = Array.isArray(data?.content) ? data.content : Array.isArray(data) ? data : [];
+      list = Array.isArray(data?.content)
+        ? data.content
+        : Array.isArray(data)
+        ? data
+        : [];
     }
 
     // Caso C: Sin filtros (últimos 20)
@@ -293,8 +312,14 @@ async function loadHistory() {
       if (!res.ok) throw new Error("Error al consultar historial");
 
       const data = await res.json();
-      list = Array.isArray(data?.content) ? data.content : Array.isArray(data) ? data : [];
+      list = Array.isArray(data?.content)
+        ? data.content
+        : Array.isArray(data)
+        ? data
+        : [];
     }
+
+    LAST_HISTORY = list;
 
     renderHistory(list);
   } catch (e) {
@@ -302,7 +327,6 @@ async function loadHistory() {
     showAlert("danger", e.message);
   }
 }
-
 
 function renderHistory(list) {
   const table = document.getElementById("historyTable");
@@ -317,19 +341,118 @@ function renderHistory(list) {
     return;
   }
 
+  function riskBadge(label) {
+    if (!label) return "-";
+    if (label.toLowerCase().includes("alto"))
+      return `<span class="badge bg-danger">Riesgo alto</span>`;
+    if (label.toLowerCase().includes("medio"))
+      return `<span class="badge bg-warning text-dark">Riesgo medio</span>`;
+    return `<span class="badge bg-success">Riesgo bajo</span>`;
+  }
+
   empty.classList.add("d-none");
   table.classList.remove("d-none");
 
   list.forEach((h) => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
-      <td>${h.customerId}</td>
-      <td>${new Date(h.createdAt).toLocaleString()}</td>
-      <td>${h.label}</td>
-      <td>${(h.probability * 100).toFixed(1)}%</td>
-    `;
+    <td>${h.customerId}</td>
+    <td>${new Date(h.createdAt).toLocaleString()}</td>
+    <td>${riskBadge(h.predictionLabel)}</td>
+    <td><code class="text-secondary">${
+      h.label
+    }</code></td>  <!-- Se agrega el formato "tech" -->
+    <td class="text-end">${(h.probability * 100).toFixed(1)}%</td>
+    <td class="text-end">
+<button
+  class="btn btn-sm btn-outline-light"
+  data-history='${JSON.stringify(h)}'
+  onclick="openHistoryDetail(this)">
+  Ver
+</button>
+    </td>
+  `;
     body.appendChild(tr);
   });
+}
+
+
+function openHistoryDetail(btn) {
+  const h = JSON.parse(btn.dataset.history);
+
+  body.innerHTML = `
+    <div class="row g-3">
+      <div class="col-12"><b>Cliente:</b> ${h.customerId}</div>
+      <div class="col-12"><b>Fecha:</b> ${new Date(
+        h.createdAt
+      ).toLocaleString()}</div>
+
+      <hr class="border-secondary">
+
+      <div class="col-md-4"><b>Plan:</b> ${h.subscriptionType}</div>
+      <div class="col-md-4"><b>Pago:</b> ${h.paymentMethod}</div>
+      <div class="col-md-4"><b>Tarifa:</b> $${h.monthlyFee}</div>
+
+      <div class="col-md-3"><b>Horas vistas:</b> ${h.watchHours}</div>
+      <div class="col-md-3"><b>Días sin acceso:</b> ${h.lastLoginDays}</div>
+      <div class="col-md-3"><b>Perfiles:</b> ${h.numberOfProfiles}</div>
+      <div class="col-md-3"><b>Prom. diario:</b> ${h.avgWatchTimePerDay}</div>
+
+      <hr class="border-secondary">
+
+      <div class="col-md-4"><b>Etiqueta ML:</b> ${h.label}</div>
+      <div class="col-md-4"><b>Resultado:</b> ${h.predictionLabel}</div>
+      <div class="col-md-4"><b>Probabilidad:</b> ${(
+        h.probability * 100
+      ).toFixed(1)}%</div>
+    </div>
+  `;
+
+  new bootstrap.Modal(document.getElementById("historyDetailModal")).show();
+}
+
+function exportHistoryCSV() {
+  if (!LAST_HISTORY || LAST_HISTORY.length === 0) {
+    showAlert(
+      "warning",
+      "No hay datos para exportar. Primero presiona Buscar."
+    );
+    return;
+  }
+
+  const rows = LAST_HISTORY.map((h) => ({
+    customerId: h.customerId,
+    createdAt: h.createdAt,
+    subscriptionType: h.subscriptionType,
+    paymentMethod: h.paymentMethod,
+    monthlyFee: h.monthlyFee,
+    watchHours: h.watchHours,
+    lastLoginDays: h.lastLoginDays,
+    numberOfProfiles: h.numberOfProfiles,
+    avgWatchTimePerDay: h.avgWatchTimePerDay,
+    label: h.label,
+    predictionLabel: h.predictionLabel,
+    probability: h.probability,
+  }));
+
+  const headers = Object.keys(rows[0]);
+  const csv = [
+    headers.join(","),
+    ...rows.map((r) =>
+      headers.map((k) => `"${String(r[k]).replaceAll('"', '""')}"`).join(",")
+    ),
+  ].join("\n");
+
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `historial_churn_${new Date().toISOString().slice(0, 10)}.csv`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
 }
 
 function validateForm() {
@@ -397,11 +520,13 @@ document.addEventListener("DOMContentLoaded", () => {
     ""
   );
 
-
-    document
+  document
     .getElementById("btnHistorySearch")
     ?.addEventListener("click", loadHistory);
 
+  document
+    .getElementById("btnHistoryExport")
+    ?.addEventListener("click", exportHistoryCSV);
 
   document.getElementById("btnClear")?.addEventListener("click", clearAll);
 
@@ -419,8 +544,4 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     predict();
   });
-
-
-
-
 });
