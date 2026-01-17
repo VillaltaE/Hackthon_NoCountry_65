@@ -241,7 +241,7 @@ async function loadHistory() {
   try {
     // Caso A: Fechas (requiere start y end)
     if (start && end) {
-      // OJO: tu endpoint demo usa "YYYY-MM-DD 00:00:00" y "YYYY-MM-DD 23:59:59"
+
       const startDate = `${start} 00:00:00`;
       const endDate = `${end} 23:59:59`;
 
@@ -353,63 +353,56 @@ function renderHistory(list) {
   empty.classList.add("d-none");
   table.classList.remove("d-none");
 
-  list.forEach((h) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
+list.forEach((h) => {
+  const safe = encodeURIComponent(JSON.stringify(h)); // ✅ NUEVA LÍNEA
+
+  const tr = document.createElement("tr");
+  tr.innerHTML = `
     <td>${h.customerId}</td>
     <td>${new Date(h.createdAt).toLocaleString()}</td>
     <td>${riskBadge(h.predictionLabel)}</td>
-    <td><code class="text-secondary">${
-      h.label
-    }</code></td>  <!-- Se agrega el formato "tech" -->
+    <td><code class="text-secondary">${h.label}</code></td>
     <td class="text-end">${(h.probability * 100).toFixed(1)}%</td>
     <td class="text-end">
-<button
-  class="btn btn-sm btn-outline-light"
-  data-history='${JSON.stringify(h)}'
-  onclick="openHistoryDetail(this)">
-  Ver
-</button>
+      <button
+        class="btn btn-sm btn-outline-light"
+        data-history="${safe}"
+        onclick="openHistoryDetail(this)">
+        Ver
+      </button>
     </td>
   `;
-    body.appendChild(tr);
+  body.appendChild(tr);
   });
 }
 
 
 function openHistoryDetail(btn) {
-  const h = JSON.parse(btn.dataset.history);
+  const h = JSON.parse(decodeURIComponent(btn.dataset.history));
+  const body = document.getElementById("historyDetailBody");
 
   body.innerHTML = `
     <div class="row g-3">
       <div class="col-12"><b>Cliente:</b> ${h.customerId}</div>
-      <div class="col-12"><b>Fecha:</b> ${new Date(
-        h.createdAt
-      ).toLocaleString()}</div>
-
+      <div class="col-12"><b>Fecha:</b> ${new Date(h.createdAt).toLocaleString()}</div>
       <hr class="border-secondary">
-
       <div class="col-md-4"><b>Plan:</b> ${h.subscriptionType}</div>
       <div class="col-md-4"><b>Pago:</b> ${h.paymentMethod}</div>
       <div class="col-md-4"><b>Tarifa:</b> $${h.monthlyFee}</div>
-
       <div class="col-md-3"><b>Horas vistas:</b> ${h.watchHours}</div>
       <div class="col-md-3"><b>Días sin acceso:</b> ${h.lastLoginDays}</div>
       <div class="col-md-3"><b>Perfiles:</b> ${h.numberOfProfiles}</div>
       <div class="col-md-3"><b>Prom. diario:</b> ${h.avgWatchTimePerDay}</div>
-
       <hr class="border-secondary">
-
       <div class="col-md-4"><b>Etiqueta ML:</b> ${h.label}</div>
       <div class="col-md-4"><b>Resultado:</b> ${h.predictionLabel}</div>
-      <div class="col-md-4"><b>Probabilidad:</b> ${(
-        h.probability * 100
-      ).toFixed(1)}%</div>
+      <div class="col-md-4"><b>Probabilidad:</b> ${(h.probability * 100).toFixed(1)}%</div>
     </div>
   `;
 
   new bootstrap.Modal(document.getElementById("historyDetailModal")).show();
 }
+
 
 function exportHistoryCSV() {
   if (!LAST_HISTORY || LAST_HISTORY.length === 0) {
