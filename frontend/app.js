@@ -268,7 +268,7 @@ async function loadHistory() {
   const end = document.getElementById("historyEndDate")?.value || ""; // YYYY-MM-DD
 
   const page = currentPage - 1; // Usar la página dinámica
-  const size = 20; // Número de registros por página
+  const size = 10; // Número de registros por página
 
   let url = "";
   let list = [];
@@ -335,11 +335,34 @@ async function loadHistory() {
 
     LAST_HISTORY = list;
     renderHistory(list);
+
+    // Verificar si no hay registros en la página actual
+    if (list.length === 0) {
+      // Deshabilitar el botón "Siguiente" si no hay datos
+      document.getElementById('btnNext').disabled = true;
+      showAlert("warning", "No hay registros para mostrar en esta página.");
+    } else {
+      // Habilitar el botón "Siguiente" si hay datos
+      document.getElementById('btnNext').disabled = false;
+    }
+
+    // Verificar si hay más registros en la siguiente página antes de habilitar "Siguiente"
+    if (list.length < size) {
+      // Si el número de registros es menor al tamaño de la página, deshabilitamos el botón "Siguiente"
+      document.getElementById('btnNext').disabled = true;
+    }
+
+    // Verificar si estamos en la primera página y deshabilitar el botón "Anterior"
+    document.getElementById('btnPrev').disabled = currentPage === 1;
+
   } catch (e) {
     console.error("[HISTORY] ERROR", e);
     showAlert("danger", e.message);
   }
 }
+
+
+
 
 
 function renderHistory(list) {
