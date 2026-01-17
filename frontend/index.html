@@ -368,6 +368,78 @@
           </div>
         </div>
       </div>
+
+      <!-- ================= HISTORIAL DE BÚSQUEDA ================= -->
+      <div class="row g-4 mt-2">
+        <div class="col-12">
+          <div class="card card-soft">
+            <div class="card-body p-4 p-lg-5">
+              <h2 class="h5 mb-1 text-white fw-semibold">
+                Historial de Búsqueda
+              </h2>
+              <p class="text-secondary mb-4">
+                Últimas predicciones realizadas (máx. 20). Filtra por cliente o
+                rango de fechas.
+              </p>
+
+              <!-- Filtros -->
+              <div class="row g-3 align-items-end mb-4">
+                <div class="col-12 col-md-4">
+                  <label class="form-label">ID del cliente</label>
+                  <input
+                    class="form-control"
+                    id="historyCustomerId"
+                    placeholder="ej: abc-123"
+                  />
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <label class="form-label">Fecha inicio</label>
+                  <input
+                    class="form-control"
+                    type="date"
+                    id="historyStartDate"
+                  />
+                </div>
+
+                <div class="col-12 col-md-3">
+                  <label class="form-label">Fecha fin</label>
+                  <input class="form-control" type="date" id="historyEndDate" />
+                </div>
+
+                <div class="col-12 col-md-2 d-grid">
+                  <button class="btn btn-primary" id="btnHistorySearch">
+                    Buscar
+                  </button>
+                </div>
+              </div>
+
+              <!-- Tabla -->
+              <div class="table-responsive">
+                <table
+                  class="table table-dark table-hover align-middle mb-0 d-none"
+                  id="historyTable"
+                >
+                  <thead>
+                    <tr>
+                      <th>Cliente</th>
+                      <th>Fecha</th>
+                      <th>Predicción</th>
+                      <th>Prob.</th>
+                    </tr>
+                  </thead>
+                  <tbody id="historyTbody"></tbody>
+                </table>
+              </div>
+
+              <div class="small text-secondary mt-3" id="historyEmpty">
+                No hay registros para mostrar.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- ========================================================= -->
     </main>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

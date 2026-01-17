@@ -222,6 +222,116 @@ function renderResult(apiResponse) {
   updateRiskMeter(prob);
 }
 
+// ================= HISTORIAL =================
+
+async function loadHistory() {
+  const customerId = document.getElementById("historyCustomerId")?.value?.trim() || "";
+  const start = document.getElementById("historyStartDate")?.value || ""; // YYYY-MM-DD
+  const end = document.getElementById("historyEndDate")?.value || "";     // YYYY-MM-DD
+
+  const page = 0;
+  const size = 20;
+
+  let url = "";
+  let list = [];
+
+  try {
+    // Caso A: Fechas (requiere start y end)
+    if (start && end) {
+      // OJO: tu endpoint demo usa "YYYY-MM-DD 00:00:00" y "YYYY-MM-DD 23:59:59"
+      const startDate = `${start} 00:00:00`;
+      const endDate = `${end} 23:59:59`;
+
+      const params = new URLSearchParams({
+        startDate,
+        endDate,
+        page,
+        size,
+      });
+
+      url = `http://localhost:8080/api/history/filter?${params.toString()}`;
+
+      console.log("[HISTORY] usando FILTER (fechas)", url);
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Error al consultar historial (filtro por fecha)");
+
+      const data = await res.json();
+
+      // Por si el backend devuelve Page<T> o lista directa
+      list = Array.isArray(data?.content) ? data.content : Array.isArray(data) ? data : [];
+
+      // Si además hay customerId, filtramos en frontend (porque no hay endpoint combinado)
+      if (customerId) {
+        const cid = customerId.toLowerCase();
+        list = list.filter((h) => String(h.customerId || "").toLowerCase().includes(cid));
+      }
+    }
+
+    // Caso B: Solo cliente
+    else if (customerId) {
+      const params = new URLSearchParams({ page, size });
+      url = `http://localhost:8080/api/history/${encodeURIComponent(customerId)}?${params.toString()}`;
+
+      console.log("[HISTORY] usando POR CLIENTE", url);
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Error al consultar historial (por cliente)");
+
+      const data = await res.json();
+      list = Array.isArray(data?.content) ? data.content : Array.isArray(data) ? data : [];
+    }
+
+    // Caso C: Sin filtros (últimos 20)
+    else {
+      const params = new URLSearchParams({ page, size });
+      url = `http://localhost:8080/api/history?${params.toString()}`;
+
+      console.log("[HISTORY] usando ULTIMOS", url);
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("Error al consultar historial");
+
+      const data = await res.json();
+      list = Array.isArray(data?.content) ? data.content : Array.isArray(data) ? data : [];
+    }
+
+    renderHistory(list);
+  } catch (e) {
+    console.error("[HISTORY] ERROR", e);
+    showAlert("danger", e.message);
+  }
+}
+
+
+function renderHistory(list) {
+  const table = document.getElementById("historyTable");
+  const body = document.getElementById("historyTbody");
+  const empty = document.getElementById("historyEmpty");
+
+  body.innerHTML = "";
+
+  if (!list || list.length === 0) {
+    table.classList.add("d-none");
+    empty.classList.remove("d-none");
+    return;
+  }
+
+  empty.classList.add("d-none");
+  table.classList.remove("d-none");
+
+  list.forEach((h) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${h.customerId}</td>
+      <td>${new Date(h.createdAt).toLocaleString()}</td>
+      <td>${h.label}</td>
+      <td>${(h.probability * 100).toFixed(1)}%</td>
+    `;
+    body.appendChild(tr);
+  });
+}
+
 function validateForm() {
   const form = $("predictForm");
   form.classList.add("was-validated");
@@ -287,6 +397,12 @@ document.addEventListener("DOMContentLoaded", () => {
     ""
   );
 
+
+    document
+    .getElementById("btnHistorySearch")
+    ?.addEventListener("click", loadHistory);
+
+
   document.getElementById("btnClear")?.addEventListener("click", clearAll);
 
   pingHealth();
@@ -303,4 +419,8 @@ document.addEventListener("DOMContentLoaded", () => {
     e.preventDefault();
     predict();
   });
+
+
+
+
 });
