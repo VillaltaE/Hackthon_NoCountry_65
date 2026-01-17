@@ -5,6 +5,23 @@ const HEALTH_URL = root.dataset.healthUrl || "http://localhost:8080/api/health";
 
 const $ = (id) => document.getElementById(id);
 
+let currentPage = 1;
+const totalPages = 5; 
+
+function updatePagination() {
+  const currentPageText = document.getElementById('currentPage');
+  const btnPrev = document.getElementById('btnPrev');
+  const btnNext = document.getElementById('btnNext');
+
+  currentPageText.textContent = `Página ${currentPage}`;
+
+  // Deshabilitar/activar botones
+  btnPrev.disabled = currentPage === 1;
+  btnNext.disabled = currentPage === totalPages;
+}
+
+
+
 function showAlert(type, msg) {
   const box = $("alertBox");
   box.className = `alert alert-${type}`;
@@ -224,6 +241,24 @@ function renderResult(apiResponse) {
   updateRiskMeter(prob);
 }
 
+
+document.getElementById('btnPrev').addEventListener('click', () => {
+  if (currentPage > 1) {
+    currentPage--;  // Decrementa la página
+    updatePagination();  // Actualiza la UI de paginación
+    loadHistory();  // Carga los datos de la nueva página
+  }
+});
+
+document.getElementById('btnNext').addEventListener('click', () => {
+  if (currentPage < totalPages) {
+    currentPage++;  // Incrementa la página
+    updatePagination();  // Actualiza la UI de paginación
+    loadHistory();  // Carga los datos de la nueva página
+  }
+});
+
+
 // ================= HISTORIAL =================
 
 async function loadHistory() {
@@ -232,8 +267,8 @@ async function loadHistory() {
   const start = document.getElementById("historyStartDate")?.value || ""; // YYYY-MM-DD
   const end = document.getElementById("historyEndDate")?.value || ""; // YYYY-MM-DD
 
-  const page = 0;
-  const size = 20;
+  const page = currentPage - 1; // Usar la página dinámica
+  const size = 20; // Número de registros por página
 
   let url = "";
   let list = [];
@@ -241,7 +276,6 @@ async function loadHistory() {
   try {
     // Caso A: Fechas (requiere start y end)
     if (start && end) {
-
       const startDate = `${start} 00:00:00`;
       const endDate = `${end} 23:59:59`;
 
@@ -257,25 +291,16 @@ async function loadHistory() {
       console.log("[HISTORY] usando FILTER (fechas)", url);
 
       const res = await fetch(url);
-      if (!res.ok)
-        throw new Error("Error al consultar historial (filtro por fecha)");
+      if (!res.ok) throw new Error("Error al consultar historial (filtro por fecha)");
 
       const data = await res.json();
+      list = Array.isArray(data?.content) ? data.content : data || [];
 
-      // Por si el backend devuelve Page<T> o lista directa
-      list = Array.isArray(data?.content)
-        ? data.content
-        : Array.isArray(data)
-        ? data
-        : [];
-
-      // Si además hay customerId, filtramos en frontend (porque no hay endpoint combinado)
+      // Si además hay customerId, filtramos en frontend
       if (customerId) {
         const cid = customerId.toLowerCase();
         list = list.filter((h) =>
-          String(h.customerId || "")
-            .toLowerCase()
-            .includes(cid)
+          String(h.customerId || "").toLowerCase().includes(cid)
         );
       }
     }
@@ -283,22 +308,15 @@ async function loadHistory() {
     // Caso B: Solo cliente
     else if (customerId) {
       const params = new URLSearchParams({ page, size });
-      url = `http://localhost:8080/api/history/${encodeURIComponent(
-        customerId
-      )}?${params.toString()}`;
+      url = `http://localhost:8080/api/history/${encodeURIComponent(customerId)}?${params.toString()}`;
 
       console.log("[HISTORY] usando POR CLIENTE", url);
 
       const res = await fetch(url);
-      if (!res.ok)
-        throw new Error("Error al consultar historial (por cliente)");
+      if (!res.ok) throw new Error("Error al consultar historial (por cliente)");
 
       const data = await res.json();
-      list = Array.isArray(data?.content)
-        ? data.content
-        : Array.isArray(data)
-        ? data
-        : [];
+      list = Array.isArray(data?.content) ? data.content : data || [];
     }
 
     // Caso C: Sin filtros (últimos 20)
@@ -312,21 +330,17 @@ async function loadHistory() {
       if (!res.ok) throw new Error("Error al consultar historial");
 
       const data = await res.json();
-      list = Array.isArray(data?.content)
-        ? data.content
-        : Array.isArray(data)
-        ? data
-        : [];
+      list = Array.isArray(data?.content) ? data.content : data || [];
     }
 
     LAST_HISTORY = list;
-
     renderHistory(list);
   } catch (e) {
     console.error("[HISTORY] ERROR", e);
     showAlert("danger", e.message);
   }
 }
+
 
 function renderHistory(list) {
   const table = document.getElementById("historyTable");
@@ -504,15 +518,16 @@ async function predict() {
 document.addEventListener("DOMContentLoaded", () => {
   // ✅ Estado inicial del panel de Resultado
   setResultEmpty(true);
-  setResultEmpty(true);
   resetResultUI();
 
   $("badgeEndpoint").textContent = `Endpoint: POST ${BACKEND_URL}`;
-  $("endpointLabel").textContent = BACKEND_URL.replace(
-    "http://localhost:8080",
-    ""
-  );
+  $("endpointLabel").textContent = BACKEND_URL.replace("http://localhost:8080", "");
 
+  // Llamada inicial a la paginación
+  updatePagination(); // Actualizar la paginación al cargar la página
+  loadHistory(); // Cargar datos iniciales de la página actual
+
+  // Manejo de eventos
   document
     .getElementById("btnHistorySearch")
     ?.addEventListener("click", loadHistory);
@@ -538,3 +553,4 @@ document.addEventListener("DOMContentLoaded", () => {
     predict();
   });
 });
+
