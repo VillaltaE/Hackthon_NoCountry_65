@@ -42,16 +42,27 @@ Detectar clientes con alta probabilidad de churn permite:
 
 ## EDA
 
-- Matplotlib.pyplot.
-- Seaborn. 
-- Numpy.
-- Pandas.
-- StatsModels.
+- matplotlib.pyplot
+- seaborn
+- numpy
+- pandas
+- scipy
 
 ## Modelo predictivo
 
-- Librerias de scikitlearn.
-- Librería Statsmodels.
+- sklearn
+- statsmodels
+- pickle
+
+
+## Versiones de librerias
+- seaborn 0.13.2
+- numpy 2.0.2
+- Pandas 2.2.2
+- sklearn 1.6.1
+- scipy 1.16.3
+- statsmodels 0.14.6
+
 
 ## Análisis estadístico
 
