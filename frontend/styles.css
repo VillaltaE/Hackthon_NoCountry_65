@@ -165,3 +165,20 @@ code{ color: #FF78B9; }
 #btnClear {
   white-space: nowrap;
 }
+
+
+
+/* Badge custom para "Riesgo medio" (mejor contraste en tema oscuro) */
+.badge-risk-medium {
+  background: #f59e0b !important; /* amber */
+  color: #111827 !important;      /* casi negro */
+  border: 1px solid rgba(245, 158, 11, 0.55) !important;
+}
+
+/* Extra: badges un poquito más "premium" */
+.badge-soft {
+  padding: .35rem .6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: .80rem;
+}

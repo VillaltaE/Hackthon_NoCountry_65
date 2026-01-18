@@ -456,26 +456,154 @@ list.forEach((h, i) => {
 }
 
 
+
 function openHistoryDetail(btn) {
   const h = JSON.parse(decodeURIComponent(btn.dataset.history));
   const body = document.getElementById("historyDetailBody");
 
+  const dt = new Date(h.createdAt);
+
+  // Fecha compacta (1 línea)
+  const whenStr =
+    dt.toLocaleDateString("es-CL", { day: "2-digit", month: "2-digit", year: "numeric" }) +
+    " · " +
+    dt.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit" });
+
+  // Helpers de formato (si existen)
+  const plan =
+    typeof toTitle === "function" ? toTitle(h.subscriptionType) : (h.subscriptionType ?? "—");
+
+  const pay =
+    typeof toTitle === "function" ? toTitle(h.paymentMethod) : (h.paymentMethod ?? "—");
+
+  const resultText =
+    typeof labelToPrevision === "function" ? labelToPrevision(h.label) : (h.label ?? "—");
+
+  const risk = h.predictionLabel ?? "—";
+  const prob = (Number(h.probability ?? 0) * 100).toFixed(1) + "%";
+
+  // Badge Resultado (suave)
+  const resultBadgeClass =
+    h.label === "will_continue"
+      ? "badge-soft bg-success text-white"
+      : h.label === "will_churn"
+      ? "badge-soft bg-danger text-white"
+      : "badge-soft bg-secondary text-white";
+
+  // Badge Riesgo (alto/medio/bajo)
+  const riskBadgeClass = (() => {
+    const v = String(risk || "").toLowerCase();
+    if (v.includes("alto")) return "badge-soft bg-danger text-white";
+    if (v.includes("medio")) return "badge-soft badge-risk-medium";
+    if (v.includes("bajo")) return "badge-soft bg-success text-white";
+    return "badge-soft bg-secondary text-white";
+  })();
+
+  // Iconitos (si tienes Bootstrap Icons)
+  const iconResult =
+    h.label === "will_continue"
+      ? "bi bi-check2-circle"
+      : h.label === "will_churn"
+      ? "bi bi-x-circle"
+      : "bi bi-info-circle";
+
+  const iconRisk = "bi bi-shield-exclamation";
+
+  // Valores seguros
+  const customerId = h.customerId ?? "—";
+  const fee = h.monthlyFee ?? "—";
+
   body.innerHTML = `
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
+      <div>
+        <div class="text-secondary small">Cliente</div>
+        <div class="fs-5 fw-semibold">${customerId}</div>
+      </div>
+
+      <div class="text-end">
+        <div class="text-secondary small">Fecha</div>
+        <div class="fw-semibold">${whenStr}</div>
+      </div>
+    </div>
+
+    <hr class="border-secondary my-3">
+
+    <!-- 3 tarjetas -->
     <div class="row g-3">
-      <div class="col-12"><b>Cliente:</b> ${h.customerId}</div>
-      <div class="col-12"><b>Fecha:</b> ${new Date(h.createdAt).toLocaleString()}</div>
-      <hr class="border-secondary">
-      <div class="col-md-4"><b>Plan:</b> ${h.subscriptionType}</div>
-      <div class="col-md-4"><b>Pago:</b> ${h.paymentMethod}</div>
-      <div class="col-md-4"><b>Tarifa:</b> $${h.monthlyFee}</div>
-      <div class="col-md-3"><b>Horas vistas:</b> ${h.watchHours}</div>
-      <div class="col-md-3"><b>Días sin acceso:</b> ${h.lastLoginDays}</div>
-      <div class="col-md-3"><b>Perfiles:</b> ${h.numberOfProfiles}</div>
-      <div class="col-md-3"><b>Prom. diario:</b> ${h.avgWatchTimePerDay}</div>
-      <hr class="border-secondary">
-      <div class="col-md-4"><b>Etiqueta ML:</b> ${h.label}</div>
-      <div class="col-md-4"><b>Resultado:</b> ${h.predictionLabel}</div>
-      <div class="col-md-4"><b>Probabilidad:</b> ${(h.probability * 100).toFixed(1)}%</div>
+      <!-- Suscripción -->
+      <div class="col-md-4">
+        <div class="p-3 rounded-3 border border-secondary-subtle bg-black bg-opacity-10 h-100">
+          <div class="text-secondary small mb-2">Suscripción</div>
+
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="text-secondary">Plan</div>
+            <div class="fw-semibold">${plan}</div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="text-secondary">Tarifa</div>
+            <div class="fw-semibold">$${fee}</div>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="text-secondary">Pago</div>
+            <div class="fw-semibold">${pay}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Predicción -->
+      <div class="col-md-4">
+        <div class="p-3 rounded-3 border border-secondary-subtle bg-black bg-opacity-10 h-100">
+          <div class="text-secondary small mb-2">Predicción</div>
+
+          <!-- Resultado -->
+          <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+            <span class="${resultBadgeClass}">
+              <i class="${iconResult} me-1"></i>${resultText}
+            </span>
+          </div>
+
+          <!-- Riesgo -->
+          <div class="text-secondary small mb-1">Riesgo</div>
+          <div class="mb-3">
+            <span class="${riskBadgeClass}">
+              <i class="${iconRisk} me-1"></i>${risk}
+            </span>
+          </div>
+
+          <!-- Probabilidad -->
+          <div class="text-secondary small">Probabilidad</div>
+          <div class="fs-4 fw-semibold">${prob}</div>
+        </div>
+      </div>
+
+      <!-- Actividad -->
+      <div class="col-md-4">
+        <div class="p-3 rounded-3 border border-secondary-subtle bg-black bg-opacity-10 h-100">
+          <div class="text-secondary small mb-2">Actividad</div>
+
+          <div class="row g-2">
+            <div class="col-6">
+              <div class="text-secondary small">Horas vistas</div>
+              <div class="fw-semibold">${h.watchHours ?? "—"}</div>
+            </div>
+            <div class="col-6">
+              <div class="text-secondary small">Días sin acceso</div>
+              <div class="fw-semibold">${h.lastLoginDays ?? "—"}</div>
+            </div>
+            <div class="col-6">
+              <div class="text-secondary small">Perfiles</div>
+              <div class="fw-semibold">${h.numberOfProfiles ?? "—"}</div>
+            </div>
+            <div class="col-6">
+              <div class="text-secondary small">Prom. diario</div>
+              <div class="fw-semibold">${h.avgWatchTimePerDay ?? "—"}</div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   `;
 
