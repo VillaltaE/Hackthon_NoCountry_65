@@ -106,6 +106,35 @@ function planFee(plan) {
   return map[plan];
 }
 
+
+function calcAvgWatchTimePerDay() {
+  const watchEl = $("watch_hours");
+  const daysEl = $("last_login_days");
+  const avgEl = $("avg_watch_time_per_day");
+
+  if (!watchEl || !daysEl || !avgEl) return;
+
+  const watchHours = Number(watchEl.value);
+  const lastLoginDays = Number(daysEl.value);
+
+  if (
+    !Number.isFinite(watchHours) || watchHours < 0 ||
+    !Number.isFinite(lastLoginDays) || lastLoginDays < 0
+  ) {
+    avgEl.value = "";
+    return;
+  }
+
+  // fórmula: watch_hours / (last_login_days + 1)
+  const avg = watchHours / (lastLoginDays + 1);
+
+  // opcional: limitar a 24 por seguridad visual
+  const capped = Math.min(24, avg);
+
+  avgEl.value = capped.toFixed(2);
+}
+
+
 // ✅ Ping PRO: el frontend consulta el health del BACKEND,
 // y el backend decide si el ML está UP o DOWN.
 async function pingHealth() {
@@ -153,10 +182,15 @@ function fillAuto() {
   $("watch_hours").value = 5;
   $("last_login_days").value = 4;
   $("number_of_profiles").value = 1;
-  $("avg_watch_time_per_day").value = 0.1;
-  $("monthly_fee").value = planFee("Basic");
+
+  $("monthly_fee").value = planFee("Basic").toFixed(2);
+
+  // ✅ importante si ahora es automático
+  calcAvgWatchTimePerDay();
+
   $("predictForm").classList.remove("was-validated");
 }
+
 
 function readPayload() {
   const subscription = $("subscription_type").value;
@@ -703,12 +737,19 @@ async function predict() {
 
     // ✅ refresca estado real (desde backend)
     await pingHealth();
+
+    // ✅ refrescar historial (para que el nuevo salga primero)
+    currentPage = 1;
+    updatePagination();
+    await loadHistory();
+
   } catch (e) {
     showAlert("warning", `No se pudo conectar al backend. (${e.message})`);
   } finally {
     setLoading(false);
   }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
   // ✅ Estado inicial del panel de Resultado
@@ -719,8 +760,8 @@ document.addEventListener("DOMContentLoaded", () => {
   $("endpointLabel").textContent = BACKEND_URL.replace("http://localhost:8080", "");
 
   // Llamada inicial a la paginación
-  updatePagination(); // Actualizar la paginación al cargar la página
-  loadHistory(); // Cargar datos iniciales de la página actual
+  updatePagination();
+  loadHistory();
 
   // Manejo de eventos
   document
@@ -742,6 +783,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const fee = planFee(e.target.value);
     if (fee !== undefined) $("monthly_fee").value = fee;
   });
+
+  // ✅ recalcular promedio diario cuando cambian inputs
+  $("watch_hours").addEventListener("input", calcAvgWatchTimePerDay);
+  $("last_login_days").addEventListener("input", calcAvgWatchTimePerDay);
+
+  // ✅ calcular al cargar por si hay valores precargados
+  calcAvgWatchTimePerDay();
 
   $("predictForm").addEventListener("submit", (e) => {
     e.preventDefault();
