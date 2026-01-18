@@ -441,13 +441,14 @@ list.forEach((h, i) => {
     <td>${toTitle(h.subscriptionType)}</td>
     <td>${toTitle(h.paymentMethod)}</td>
     <td class="text-end">${(h.probability * 100).toFixed(1)}%</td>
-    <td class="text-end">
-      <button
-        class="btn btn-sm btn-outline-light"
-        data-history="${safe}"
-        onclick="openHistoryDetail(this)">
-        Ver
-      </button>
+
+    <td class="text-center">
+    <button
+      class="btn btn-sm btn-outline-secondary px-3"
+      data-history="${safe}"
+      onclick="openHistoryDetail(this)">
+      <i class="bi bi-eye me-1"></i> Detalle
+    </button>
     </td>
   `;
   body.appendChild(tr);
