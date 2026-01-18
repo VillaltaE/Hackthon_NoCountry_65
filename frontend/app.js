@@ -9,6 +9,14 @@ let currentPage = 1;
 const totalPages = 5; 
 const page_size = 10;
 
+function toTitle(v) {
+  return String(v ?? "—")
+    .toLowerCase()
+    .replaceAll("_", " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+
 function updatePagination() {
   const currentPageText = document.getElementById('currentPage');
   const btnPrev = document.getElementById('btnPrev');
@@ -404,8 +412,8 @@ list.forEach((h, i) => {
     <td>${new Date(h.createdAt).toLocaleString()}</td>
     <td>${riskBadge(h.predictionLabel)}</td>
     <td><div>${labelToPrevision(h.label)}</div></td>
-    <td>${h.subscriptionType ?? "-"}</td>
-    <td>${h.paymentMethod ?? "-"}</td>
+    <td>${toTitle(h.subscriptionType)}</td>
+    <td>${toTitle(h.paymentMethod)}</td>
     <td class="text-end">${(h.probability * 100).toFixed(1)}%</td>
     <td class="text-end">
       <button
