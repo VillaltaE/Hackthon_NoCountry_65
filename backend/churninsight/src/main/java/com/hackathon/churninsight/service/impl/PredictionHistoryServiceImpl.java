@@ -7,6 +7,7 @@ import com.hackathon.churninsight.service.PredictionHistoryService;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,21 +21,22 @@ public class PredictionHistoryServiceImpl implements PredictionHistoryService {
         this.repo = repo;
     }
 
+    // Método para cargar el historial paginado
     @Override
     public List<PredictionHistoryDTO> latest(int page, int size) {
-        // Usamos PageRequest para la paginación
-        PageRequest pageRequest = PageRequest.of(page, size);
-        // Recuperamos la página de resultados y mapeamos a DTO
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         Page<PredictionHistory> historyPage = repo.findAll(pageRequest);
+
         return historyPage.stream()
                 .map(this::toDto)
                 .toList();
     }
 
+    // Método para filtrar por Cliente
     @Override
     public List<PredictionHistoryDTO> byCustomer(String customerId, int page, int size) {
         // Usamos PageRequest para la paginación
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         // Recuperamos la página de resultados y mapeamos a DTO
         Page<PredictionHistory> historyPage = repo.findByCustomerId(customerId, pageRequest);
         return historyPage.stream()
@@ -46,7 +48,7 @@ public class PredictionHistoryServiceImpl implements PredictionHistoryService {
     @Override
     public List<PredictionHistoryDTO> byDateRange(LocalDateTime startDate, LocalDateTime endDate, int page, int size) {
         // Usamos PageRequest para la paginación
-        PageRequest pageRequest = PageRequest.of(page, size);
+        PageRequest pageRequest = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
         // Recuperamos la página de resultados filtrada por fecha
         Page<PredictionHistory> historyPage = repo.findByCreatedAtBetween(startDate, endDate, pageRequest);
         return historyPage.stream()
