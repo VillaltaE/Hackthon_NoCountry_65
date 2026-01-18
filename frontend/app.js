@@ -66,10 +66,18 @@ function resetResultUI() {
     "riskHint",
     "debugInfo",
   ];
-  ids.forEach((id) => {
-    const el = document.getElementById(id);
-    if (el) el.textContent = "—";
-  });
+ids.forEach((id) => {
+  const el = document.getElementById(id);
+  if (!el) return;
+
+  // ✅ debugInfo sin placeholder
+  if (id === "debugInfo") {
+    el.textContent = "";
+    return;
+  }
+
+  el.textContent = "—";
+});
 
   const bar = document.getElementById("riskBar");
   if (bar) bar.style.width = "0%";
@@ -751,7 +759,7 @@ async function predict() {
 }
 
 
-document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", () => {
   // ✅ Estado inicial del panel de Resultado
   setResultEmpty(true);
   resetResultUI();
@@ -765,8 +773,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Manejo de eventos
   document
-    .getElementById("btnHistorySearch")
-    ?.addEventListener("click", loadHistory);
+  .getElementById("btnHistorySearch")
+  ?.addEventListener("click", () => {
+    currentPage = 1;
+    updatePagination();
+    loadHistory();
+  });
 
   document
     .getElementById("btnHistoryExport")
@@ -791,9 +803,14 @@ document.addEventListener("DOMContentLoaded", () => {
   // ✅ calcular al cargar por si hay valores precargados
   calcAvgWatchTimePerDay();
 
+  document.getElementById("customer_id")?.focus();
+
+
   $("predictForm").addEventListener("submit", (e) => {
     e.preventDefault();
     predict();
   });
+
+
 });
 
