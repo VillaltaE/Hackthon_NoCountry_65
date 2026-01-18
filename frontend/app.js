@@ -398,6 +398,21 @@ function renderHistory(list) {
     return `<span class="badge bg-success">Riesgo bajo</span>`;
   }
 
+  function resultClass(label) {
+    if (!label) return "text-secondary";
+    if (label === "will_churn") return "text-warning";      // más suave que rojo
+    if (label === "will_continue") return "text-info";      // más suave que verde
+    return "text-secondary";
+  }
+
+  function resultTextClass(label) {
+  if (label === "will_churn") return "text-warning opacity-75 fw-semibold";
+  if (label === "will_continue") return "text-info opacity-75 fw-semibold";
+  return "text-secondary";
+  }
+
+
+
   empty.classList.add("d-none");
   table.classList.remove("d-none");
 
@@ -406,12 +421,23 @@ list.forEach((h, i) => {
   const safe = encodeURIComponent(JSON.stringify(h)); // ✅ NUEVA LÍNEA
   const rowNumber = startIndex + i + 1; 
   const tr = document.createElement("tr");
+  const d = new Date(h.createdAt);
+  const fecha = d.toLocaleDateString("es-CL"); // 15-01-2026 (según config)
+  const hora = d.toLocaleTimeString("es-CL", { hour: "2-digit", minute: "2-digit", hour12: false });
+
   tr.innerHTML = `
     <td>${rowNumber}</td>
-    <td>${h.customerId}</td>
-    <td>${new Date(h.createdAt).toLocaleString()}</td>
+    <td class="font-monospace">${h.customerId}</td>
+    <td> <div>${fecha}</div> <small class="text-secondary">${hora}</small></td>
     <td>${riskBadge(h.predictionLabel)}</td>
-    <td><div>${labelToPrevision(h.label)}</div></td>
+
+    <td>
+    <span class="${resultTextClass(h.label)}">
+    ${labelToPrevision(h.label)}
+    </span>
+    </td>
+    
+   
     <td>${toTitle(h.subscriptionType)}</td>
     <td>${toTitle(h.paymentMethod)}</td>
     <td class="text-end">${(h.probability * 100).toFixed(1)}%</td>
