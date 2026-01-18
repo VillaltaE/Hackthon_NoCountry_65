@@ -575,9 +575,12 @@ function openHistoryDetail(btn) {
 
           <!-- Probabilidad -->
           <div class="text-secondary small">Probabilidad</div>
-          <div class="fs-4 fw-semibold">${prob}</div>
-        </div>
-      </div>
+          <div class="d-flex align-items-baseline gap-2">
+          <div div class="fs-3 fw-semibold">${prob}</div>
+
+          </div>
+          </div>
+          </div>
 
       <!-- Actividad -->
       <div class="col-md-4">
