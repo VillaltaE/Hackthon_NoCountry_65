@@ -523,7 +523,7 @@ function openHistoryDetail(btn) {
 
       <div class="text-end">
         <div class="text-secondary small">Fecha</div>
-        <div class="fw-semibold">${whenStr}</div>
+        <div class="text-secondary small">${whenStr}</div>
       </div>
     </div>
 
