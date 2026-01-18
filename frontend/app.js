@@ -7,6 +7,7 @@ const $ = (id) => document.getElementById(id);
 
 let currentPage = 1;
 const totalPages = 5; 
+const page_size = 10;
 
 function updatePagination() {
   const currentPageText = document.getElementById('currentPage');
@@ -167,8 +168,9 @@ function readPayload() {
 }
 
 function labelToPrevision(label) {
-  if (label === "will_churn") return "Va a cancelar";
-  if (label === "will_continue") return "Va a continuar";
+  const v = String(label || "").trim().toLowerCase();
+  if (v === "will_churn") return "Va a cancelar";
+  if (v === "will_continue") return "Va a continuar";
   return "—";
 }
 
@@ -268,7 +270,7 @@ async function loadHistory() {
   const end = document.getElementById("historyEndDate")?.value || ""; // YYYY-MM-DD
 
   const page = currentPage - 1; // Usar la página dinámica
-  const size = 10; // Número de registros por página
+  const size = page_size; // Número de registros por página
 
   let url = "";
   let list = [];
@@ -369,6 +371,7 @@ function renderHistory(list) {
   const table = document.getElementById("historyTable");
   const body = document.getElementById("historyTbody");
   const empty = document.getElementById("historyEmpty");
+  const startIndex = (currentPage - 1) * page_size;
 
   body.innerHTML = "";
 
@@ -390,15 +393,19 @@ function renderHistory(list) {
   empty.classList.add("d-none");
   table.classList.remove("d-none");
 
-list.forEach((h) => {
-  const safe = encodeURIComponent(JSON.stringify(h)); // ✅ NUEVA LÍNEA
 
+list.forEach((h, i) => {
+  const safe = encodeURIComponent(JSON.stringify(h)); // ✅ NUEVA LÍNEA
+  const rowNumber = startIndex + i + 1; 
   const tr = document.createElement("tr");
   tr.innerHTML = `
+    <td>${rowNumber}</td>
     <td>${h.customerId}</td>
     <td>${new Date(h.createdAt).toLocaleString()}</td>
     <td>${riskBadge(h.predictionLabel)}</td>
-    <td><code class="text-secondary">${h.label}</code></td>
+    <td><div>${labelToPrevision(h.label)}</div></td>
+    <td>${h.subscriptionType ?? "-"}</td>
+    <td>${h.paymentMethod ?? "-"}</td>
     <td class="text-end">${(h.probability * 100).toFixed(1)}%</td>
     <td class="text-end">
       <button
