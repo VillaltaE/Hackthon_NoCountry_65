@@ -646,9 +646,72 @@ function openHistoryDetail(btn) {
         </div>
       </div>
     </div>
+
+      <!-- ================= FACTORES DE RIESGO ================= -->
+      <hr class="border-secondary my-4">
+
+      <h6 class="fw-semibold mb-2">Factores de riesgo</h6>
+      <ul id="riskFactorsList" class="list-group list-group-flush mb-3">
+        <li class="list-group-item bg-dark text-secondary">
+          Cargando factores de riesgo...
+        </li>
+      </ul>
+
+      <h6 class="fw-semibold mb-1">Acción sugerida</h6>
+      <p id="riskSuggestedAction" class="text-secondary mb-3">—</p>
+      </div>
   `;
+  // Cargar factores de riesgo
+  loadRiskFactors(h.customerId);
 
   new bootstrap.Modal(document.getElementById("historyDetailModal")).show();
+}
+
+async function loadRiskFactors(customerId) {
+  try {
+    const res = await fetch(
+      `http://localhost:8080/api/risk-factors/${customerId}`
+    );
+
+    if (!res.ok) {
+      throw new Error("No se pudieron obtener los factores de riesgo");
+    }
+
+    const data = await res.json();
+    renderRiskFactors(data);
+
+  } catch (e) {
+    console.error(e);
+    renderRiskFactors(null);
+  }
+}
+
+function renderRiskFactors(data) {
+  const list = document.getElementById("riskFactorsList");
+  const action = document.getElementById("riskSuggestedAction");
+
+  if (!list || !action) return;
+
+  list.innerHTML = "";
+
+  if (!data || !data.riskFactors || data.riskFactors.length === 0) {
+    list.innerHTML = `
+      <li class="list-group-item bg-dark text-secondary">
+        No se identificaron factores relevantes
+      </li>
+    `;
+    action.textContent = data?.suggestedAction ?? "—";
+    return;
+  }
+
+  data.riskFactors.forEach((factor) => {
+    const li = document.createElement("li");
+    li.className = "list-group-item bg-dark text-white";
+    li.textContent = factor;
+    list.appendChild(li);
+  });
+
+  action.textContent = data.suggestedAction ?? "—";
 }
 
 

@@ -193,3 +193,28 @@ code{ color: #FF78B9; }
   font-weight: 600;
   font-size: .80rem;
 }
+
+.risk-factor-item {
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.10);
+  border-radius: 12px;
+  padding: .55rem .75rem;
+  margin-bottom: .5rem;
+  font-size: .85rem;
+  color: rgba(234,240,255,.92);
+}
+
+.risk-factor-high {
+  border-color: rgba(239,68,68,.35);
+  background: rgba(239,68,68,.08);
+}
+
+.risk-factor-medium {
+  border-color: rgba(245,158,11,.35);
+  background: rgba(245,158,11,.08);
+}
+
+.risk-factor-low {
+  border-color: rgba(34,197,94,.30);
+  background: rgba(34,197,94,.08);
+}
