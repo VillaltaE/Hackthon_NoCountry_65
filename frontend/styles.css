@@ -40,6 +40,17 @@ body{
   box-shadow: 0 0 18px rgba(124,92,255,.55);
 }
 
+/* Animación sutil para las tarjetas de KPI al pasar el mouse */
+#kpisSection .card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+#kpisSection .card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
 .card-soft{
   background: linear-gradient(180deg, rgba(15,23,42,.88), rgba(8,12,24,.92));
   border: 1px solid var(--border);
