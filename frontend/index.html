@@ -59,6 +59,45 @@
     </nav>
 
     <main class="container py-4 py-lg-5">
+
+      <!-- ===============================
+            KPIs Section - Single Row
+      =============================== -->
+      <div class="d-flex justify-content-between flex-wrap mb-4" id="kpisSection">
+
+        <!-- Total Evaluados -->
+        <div class="card text-center bg-dark text-white p-3 m-1 flex-fill" style="min-width: 150px;">
+          <div class="card-title text-secondary mb-2">Total Evaluados</div>
+          <div class="h3 fw-bold" id="kpiTotal">—</div>
+        </div>
+
+        <!-- Riesgo Alto -->
+        <div class="card text-center bg-danger text-white p-3 m-1 flex-fill" style="min-width: 150px;">
+          <div class="card-title text-white mb-2">Riesgo Alto</div>
+          <div class="h3 fw-bold" id="kpiHigh">—</div>
+        </div>
+
+        <!-- Riesgo Medio -->
+        <div class="card text-center bg-warning text-dark p-3 m-1 flex-fill" style="min-width: 150px;">
+          <div class="card-title text-dark mb-2">Riesgo Medio</div>
+          <div class="h3 fw-bold" id="kpiMedium">—</div>
+        </div>
+
+        <!-- Riesgo Bajo -->
+        <div class="card text-center bg-success text-white p-3 m-1 flex-fill" style="min-width: 150px;">
+          <div class="card-title text-white mb-2">Riesgo Bajo</div>
+          <div class="h3 fw-bold" id="kpiLow">—</div>
+        </div>
+
+        <!-- Tasa de churn -->
+        <div class="card text-center bg-info text-white p-3 m-1 flex-fill" style="min-width: 150px;">
+          <div class="card-title text-white mb-2">Tasa de churn (%)</div>
+          <div class="h3 fw-bold" id="kpiChurnRate">—</div>
+        </div>
+
+      </div>
+
+
       <div class="row g-4 align-items-stretch">
         <!-- Left: Form -->
         <div class="col-12 col-lg-7">

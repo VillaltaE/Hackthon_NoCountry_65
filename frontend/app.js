@@ -414,9 +414,6 @@ async function loadHistory() {
 }
 
 
-
-
-
 function renderHistory(list) {
   const table = document.getElementById("historyTable");
   const body = document.getElementById("historyTbody");
@@ -811,6 +808,24 @@ async function predict() {
     predict();
   });
 
+  async function loadKPIs() {
+  try {
+    const res = await fetch("http://localhost:8080/api/kpis");
+    if (!res.ok) throw new Error("Error loading KPIs");
+    const data = await res.json();
+
+    $("kpiTotal").textContent = data.totalEvaluated ?? "—";
+    $("kpiHigh").textContent = data.highRisk ?? "—";
+    $("kpiMedium").textContent = data.mediumRisk ?? "—";
+    $("kpiLow").textContent = data.lowRisk ?? "—";
+    $("kpiChurnRate").textContent = data.churnRate?.toFixed(2) ?? "—";
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+// Llamar al cargar DOM
+loadKPIs();
 
 });
 
