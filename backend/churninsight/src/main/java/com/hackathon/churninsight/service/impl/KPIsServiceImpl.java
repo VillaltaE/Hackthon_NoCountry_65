@@ -17,14 +17,23 @@ public class KPIsServiceImpl implements KPIsService {
 
     @Override
     public KPIsDTO getKPIs() {
-        List<PredictionHistory> all = historyRepo.findAll();
+        List<PredictionHistory> latest = historyRepo.findLatestPerCustomer();
 
-        long total = all.size();
-        long high = all.stream().filter(h -> "Riesgo alto".equalsIgnoreCase(h.getPredictionLabel())).count();
-        long medium = all.stream().filter(h -> "Riesgo medio".equalsIgnoreCase(h.getPredictionLabel())).count();
-        long low = all.stream().filter(h -> "Riesgo bajo".equalsIgnoreCase(h.getPredictionLabel())).count();
+        long total = latest.size();
+        long high = latest.stream()
+                .filter(h -> "Riesgo alto".equalsIgnoreCase(h.getPredictionLabel()))
+                .count();
+        long medium = latest.stream()
+                .filter(h -> "Riesgo medio".equalsIgnoreCase(h.getPredictionLabel()))
+                .count();
+        long low = latest.stream()
+                .filter(h -> "Riesgo bajo".equalsIgnoreCase(h.getPredictionLabel()))
+                .count();
 
-        double churnRate = total > 0 ? (double) high / total * 100 : 0;
+        // Tasa de churn
+        double churnRate = total > 0 ? (double) latest.stream()
+                .filter(h -> "will_churn".equalsIgnoreCase(h.getLabel()))
+                .count() / total * 100 : 0.0;
 
         return new KPIsDTO(total, high, medium, low, churnRate);
     }
