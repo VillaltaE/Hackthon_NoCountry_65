@@ -42,13 +42,15 @@ Detectar clientes con alta probabilidad de churn permite:
 
 ### 🤖 Funcionalidades
 
-- Endpoint que devuelve una predicción sobre el cliente y la probabilidad asociada a la misma.
-- Carga del modelo predictivo a través de una API .
-- Dashboard con formulario y resultados de predicción.
-- Validación de las entradas de campos obligatorios.
-- Respuesta estructurada que incluye predicción y probabilidad de churn.
-- Guardar las predicciones en una base de datos PostgreSQL.
+- Generación de predicciones de churn por cliente utilizando un modelo de Machine Learning externo.
+- Exposición de una API REST para el consumo de predicciones y datos de churn.
+- Interfaz web (frontend) con formulario para el ingreso de datos y visualización de resultados de predicción.
+- Validación de campos obligatorios en las solicitudes.
+- Respuesta estructurada que incluye predicción, probabilidad de churn y mensaje interpretativo.
+- Persistencia del historial de predicciones en una base de datos PostgreSQL (Supabase).
 - Visualización y descarga del historial de predicciones.
+- Cálculo de KPIs básicos de churn (total evaluados, niveles de riesgo alto/medio/bajo y tasa de churn) y visualización en el frontend.
+- Obtención de factores de riesgo y sugerencias de acción personalizadas por cliente.
 - Pruebas unitarias.
 
 ---
@@ -103,20 +105,24 @@ Hackthon_NoCountry_65/
 │
 └── api-python/               # API en Python para servir el modelo de predicción
 |
-|__ frontend/                 # Formulario y resultados de las predicciones
+└── frontend/                 # Formulario y resultados de las predicciones
 
 ```
 ---
 
-#### ⚠️ Nota importante sobre la ejecución
+#### ⚠️ Nota sobre la ejecución
 
-El repositorio contiene varios proyectos independientes. El proyecto ejecutable es:
+Este repositorio contiene un sistema compuesto por varios proyectos independientes (frontend, backend y servicio de Machine Learning).
 
-```
-backend/churninsight
-```
+Cada componente se ejecuta de forma separada y cumple un rol específico dentro de la arquitectura del sistema.
 
-El repositorio raíz no es un proyecto Java y no se ejecuta directamente.
+Para levantar el sistema completo, se recomienda ejecutar los servicios en el siguiente orden:
+
+1. API Python (FastAPI – modelo de Machine Learning)
+2. Backend Java (Spring Boot – orquestación y persistencia)
+3. Frontend (interfaz web)
+
+Las instrucciones detalladas de ejecución se encuentran en los README de cada componente.
 
 ---
 
