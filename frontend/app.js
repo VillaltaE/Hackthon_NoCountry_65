@@ -229,7 +229,7 @@ function updateRiskMeter(probability) {
   bar.style.width = "0%";
   bar.className = "progress-bar";
   txt.textContent = "—";
-  hint.textContent = "—";
+  hint.textContent = "";
 
   // Validar la probabilidad
   if (
@@ -688,13 +688,13 @@ function openHistoryDetail(btn) {
       </div>
     </div>
 
-      <!-- ================= FACTORES DE RIESGO ================= -->
+      <!-- ================= SEÑALES DE COMPORTAMIENTO ================= -->
       <hr class="border-secondary my-4">
 
-      <h6 class="fw-semibold mb-2">Factores de riesgo</h6>
+      <h6 class="fw-semibold mb-2">Señales de comportamiento</h6>
       <ul id="riskFactorsList" class="list-group list-group-flush mb-3">
         <li class="list-group-item bg-dark text-secondary">
-          Cargando factores de riesgo...
+          Cargando señales de comportamiento ...
         </li>
       </ul>
 
@@ -702,7 +702,7 @@ function openHistoryDetail(btn) {
       <p id="riskSuggestedAction" class="text-secondary mb-3">—</p>
       </div>
   `;
-  // Cargar factores de riesgo
+  // Cargar señales de comportamiento
   loadRiskFactors(h.customerId);
 
   new bootstrap.Modal(document.getElementById("historyDetailModal")).show();
@@ -715,7 +715,7 @@ async function loadRiskFactors(customerId) {
     );
 
     if (!res.ok) {
-      throw new Error("No se pudieron obtener los factores de riesgo");
+      throw new Error("No se pudieron obtener señales de comportamiento");
     }
 
     const data = await res.json();
