@@ -16,7 +16,6 @@ function toTitle(v) {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-
 function updatePagination() {
   const currentPageText = document.getElementById('currentPage');
   const btnPrev = document.getElementById('btnPrev');
@@ -28,8 +27,6 @@ function updatePagination() {
   btnPrev.disabled = currentPage === 1;
   btnNext.disabled = currentPage === totalPages;
 }
-
-
 
 function showAlert(type, msg) {
   const box = $("alertBox");
@@ -113,7 +110,6 @@ function planFee(plan) {
   const map = { Basic: 8.99, Standard: 13.99, Premium: 17.99 };
   return map[plan];
 }
-
 
 function calcAvgWatchTimePerDay() {
   const watchEl = $("watch_hours");
@@ -247,15 +243,15 @@ function updateRiskMeter(probability) {
   const churnPct = Math.round(churnRisk * 100);
   bar.style.width = `${churnPct}%`;
 
-  let level = "Bajo";
+  let level = "Riesgo bajo";
   let klass = "bg-success";
 
   // Definir los niveles de riesgo y los colores de la barra
   if (churnRisk >= 0.7) {
-    level = "Alto";
+    level = "Riesgo alto";
     klass = "bg-danger";
   } else if (churnRisk >= 0.35) {
-    level = "Medio";
+    level = "Riesgo Medio";
     klass = "bg-warning";
   }
 
@@ -271,6 +267,8 @@ function updateRiskMeter(probability) {
       "Riesgo medio: conviene monitorear y aplicar retención ligera.";
   if (level === "Alto")
     hint.textContent = "Riesgo alto: recomendar acción inmediata de retención.";
+
+   return level;
 }
 
 let LAST_HISTORY = [];
@@ -285,12 +283,58 @@ function renderResult(apiResponse) {
   $("outCustomer").textContent = data.customer_id ?? "—";
   $("outLabel").textContent = label ?? "—";
   $("outProb").textContent = formatProb(prob);
-  $("outPrevision").textContent = data.prevision ?? labelToPrevision(label);
+
+  const riskLevel = updateRiskMeter(prob);
+  $("outPrevision").textContent = riskLevel ?? "—";
+
+  const riskBadgeEl = document.getElementById("riskBadgeMain");  
+    if (riskBadgeEl && riskLevel) {
+    riskBadgeEl.innerHTML = riskBadge(riskLevel); 
+  }
+
   $(
     "debugInfo"
   ).textContent = `Status: ${apiResponse.status} | Path: ${apiResponse.path}`;
+  
+  // === BOTÓN DETALLE ===
+  const detailContainer = document.getElementById("resultDetailContainer");
+  if (detailContainer) {
+    detailContainer.innerHTML = `
+      <button
+        class="btn btn-sm btn-outline-secondary mt-2 mx-auto d-block"
+        onclick="openCurrentPredictionDetail('${riskLevel}')">
+        <i class="bi bi-eye me-1"></i> Ver detalles de esta predicción
+      </button>
+    `;
+  }
+}
 
-  updateRiskMeter(prob);
+function openCurrentPredictionDetail(riskLevel) {
+  const h = {
+    customerId: $("customer_id").value,
+    subscriptionType: $("subscription_type").value,
+    paymentMethod: $("payment_method").value,
+    monthlyFee: Number($("monthly_fee").value),
+    watchHours: Number($("watch_hours").value),
+    lastLoginDays: Number($("last_login_days").value),
+    numberOfProfiles: Number($("number_of_profiles").value),
+    avgWatchTimePerDay: Number($("avg_watch_time_per_day").value),
+
+    // Guardamos la etiqueta real del modelo, no la "previsión" legible
+    label: $("outLabel").textContent === "—" ? null : $("outLabel").textContent.trim(),  
+
+    // Predicción legible para mostrar en UI
+    predictionLabel: $("outPrevision").textContent === "—" ? null : $("outPrevision").textContent.trim(),  
+
+    risk: riskLevel ?? "—",
+
+    // Probabilidad como número entre 0 y 1
+    probability: Number($("outProb").textContent.split("(")[0]),
+ 
+    createdAt: new Date().toISOString()
+  };
+  
+  openHistoryDetail({ dataset: { history: encodeURIComponent(JSON.stringify(h)) } });
 }
 
 
@@ -450,8 +494,6 @@ function renderHistory(list) {
   return "text-secondary";
   }
 
-
-
   empty.classList.add("d-none");
   table.classList.remove("d-none");
 
@@ -475,7 +517,7 @@ list.forEach((h, i) => {
     ${labelToPrevision(h.label)}
     </span>
     </td>
-    
+  
    
     <td>${toTitle(h.subscriptionType)}</td>
     <td>${toTitle(h.paymentMethod)}</td>
@@ -494,10 +536,9 @@ list.forEach((h, i) => {
   });
 }
 
-
-
 function openHistoryDetail(btn) {
   const h = JSON.parse(decodeURIComponent(btn.dataset.history));
+  
   const body = document.getElementById("historyDetailBody");
 
   const dt = new Date(h.createdAt);
@@ -818,7 +859,6 @@ async function predict() {
   }
 }
 
-
   document.addEventListener("DOMContentLoaded", () => {
   // ✅ Estado inicial del panel de Resultado
   setResultEmpty(true);
@@ -891,4 +931,3 @@ async function predict() {
 loadKPIs();
 
 });
-
