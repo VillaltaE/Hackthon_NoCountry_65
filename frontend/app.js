@@ -232,8 +232,9 @@ function updateRiskMeter(probability) {
     probability === undefined ||
     probability === null ||
     Number.isNaN(Number(probability))
-  )
-    return;
+  ) {
+    return "Riesgo no calculado"; // En caso de error, asignar un valor predeterminado
+  }
 
   const churnRisk = Math.max(0, Math.min(1, Number(probability)));
   const churnPct = Math.round(churnRisk * 100);
@@ -263,10 +264,13 @@ function updateRiskMeter(probability) {
     hint.textContent = "Riesgo bajo de abandono según el modelo.";
   } else if (level === "Moderado") {
     hint.textContent =
-      "Riesgo moderado: conviene monitorear y aplicar retención ligera.";
+      "Riesgo medio: conviene monitorear y aplicar retención ligera.";
   } else if (level === "Alto") {
     hint.textContent = "Riesgo alto: recomendar acción inmediata de retención.";
   }
+
+  // Devolvemos el valor del riesgo para usarlo en el campo 'outPrevision'
+  return level; // Regresa el valor del riesgo (Alto, Moderado, Bajo)
 }
 
 let LAST_HISTORY = [];
