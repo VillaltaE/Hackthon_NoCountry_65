@@ -218,3 +218,14 @@ code{ color: #FF78B9; }
   border-color: rgba(34,197,94,.30);
   background: rgba(34,197,94,.08);
 }
+
+#actionSuggestedSection {
+    color: #4caf50; /* Verde más suave para el texto */
+}
+
+
+#actionSuggestedSenal {
+    color: hsl(38, 93%, 48%); /* Verde más suave para el texto */
+}
+
+
