@@ -125,9 +125,9 @@ public class PredictServiceImpl implements PredictService {
         }
 
         private String mapRiskLabel(double probability) {
-                if (probability >= 0.8) {
+                if (probability >= 0.7) {
                         return "Riesgo alto";
-                } else if (probability >= 0.5) {
+                } else if (probability >= 0.3) {
                         return "Riesgo medio";
                 } else {
                         return "Riesgo bajo";
