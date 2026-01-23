@@ -229,7 +229,7 @@ function updateRiskMeter(probability) {
   bar.style.width = "0%";
   bar.className = "progress-bar";
   txt.textContent = "—";
-  hint.textContent = "";
+  hint.textContent = "—";
 
   // Validar la probabilidad
   if (
@@ -243,16 +243,19 @@ function updateRiskMeter(probability) {
   const churnPct = Math.round(churnRisk * 100);
   bar.style.width = `${churnPct}%`;
 
-  let level = "Riesgo bajo";
+  let level = "Bajo";
   let klass = "bg-success";
 
   // Definir los niveles de riesgo y los colores de la barra
-  if (churnRisk >= 0.7) {
-    level = "Riesgo alto";
+  if (churnRisk > 0.70) {
+    level = "Alto";
     klass = "bg-danger";
-  } else if (churnRisk >= 0.35) {
-    level = "Riesgo Medio";
+  } else if (churnRisk >= 0.30) {
+    level = "Moderado";
     klass = "bg-warning";
+  } else {
+    level = "Bajo";
+    klass = "bg-success";
   }
 
   // Actualizar la clase de la barra
@@ -260,16 +263,16 @@ function updateRiskMeter(probability) {
   txt.textContent = `${level} (${churnPct}%)`;
 
   // Mensajes adicionales según el nivel de riesgo
-  if (level === "Bajo")
+  if (level === "Bajo") {
     hint.textContent = "Riesgo bajo de abandono según el modelo.";
-  if (level === "Medio")
+  } else if (level === "Moderado") {
     hint.textContent =
-      "Riesgo medio: conviene monitorear y aplicar retención ligera.";
-  if (level === "Alto")
+      "Riesgo moderado: conviene monitorear y aplicar retención ligera.";
+  } else if (level === "Alto") {
     hint.textContent = "Riesgo alto: recomendar acción inmediata de retención.";
-
-   return level;
+  }
 }
+
 
 let LAST_HISTORY = [];
 
