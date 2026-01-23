@@ -6,7 +6,7 @@ const HEALTH_URL = root.dataset.healthUrl || "http://localhost:8080/api/health";
 const $ = (id) => document.getElementById(id);
 
 let currentPage = 1;
-const totalPages = 5;
+const totalPages = 50;
 const page_size = 10;
 
 function toTitle(v) {
