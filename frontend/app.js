@@ -324,14 +324,14 @@ function renderResult(apiResponse) {
 
 function changePredictionColor(element, label) {
   if (label === "will_continue") {
-    element.style.backgroundColor = "transparent"; // Fondo transparente
-    element.style.color = "rgb(1, 198, 1)"; // Verde claro
+    element.style.backgroundColor = "transparent"; 
+    element.style.color = "var(--bs-success)"; 
   } else if (label === "will_churn") {
-    element.style.backgroundColor = "transparent"; // Fondo transparente
-    element.style.color = "rgb(243, 0, 0)"; // Verde claro
+    element.style.backgroundColor = "transparent"; 
+    element.style.color = "var(--bs-danger)"; 
   } else {
-    element.style.backgroundColor = "transparent"; // Fondo transparente
-    element.style.color = "gray"; // Texto gris en caso de que no haya predicción
+    element.style.backgroundColor = "transparent"; 
+    element.style.color = "var(--bs-secondary)"; 
   }
 }
 
