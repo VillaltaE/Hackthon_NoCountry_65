@@ -216,19 +216,32 @@ function fillAuto() {
   select.value = values[randInt(0, values.length - 1)];
 
   // Escenarios
-  if (scenario === "high") {
-    $("watch_hours").value = randFloat(0.0, 8.0, 1);
-    $("last_login_days").value = randInt(15, 120);
-    $("number_of_profiles").value = randInt(1, 2);
-  } else if (scenario === "low") {
-    $("watch_hours").value = randFloat(20.0, 140.0, 1);
-    $("last_login_days").value = randInt(0, 5);
-    $("number_of_profiles").value = randInt(2, 5);
-  } else {
-    $("watch_hours").value = randFloat(8.0, 40.0, 1);
-    $("last_login_days").value = randInt(3, 20);
-    $("number_of_profiles").value = randInt(1, 4);
-  }
+
+  // High churn (alto riesgo): 0–6 hrs, 20–60 días sin entrar, 1–2 perfiles
+  //Low churn (bajo riesgo): 15–45 hrs, 1–5 días, 2–5 perfiles
+  //Mixed: 6–25 hrs, 3–20 días, 1–4 perfiles
+if (scenario === "high") {
+  // Poco uso
+  $("watch_hours").value = randFloat(0.0, 6.0, 1);
+  $("last_login_days").value = randInt(20, 60);
+  $("number_of_profiles").value = randInt(1, 2);
+
+} else if (scenario === "low") {
+  // Uso alto 
+  $("watch_hours").value = randFloat(18.0, 45.0, 1);
+  $("last_login_days").value = randInt(1, 5);
+  $("number_of_profiles").value = randInt(2, 5);
+
+} else {
+  // Mixto
+  $("watch_hours").value = randFloat(6.0, 25.0, 1);
+  $("last_login_days").value = randInt(3, 20);
+  $("number_of_profiles").value = randInt(1, 4);
+}
+
+
+  $("watch_hours").value = Math.min(45, Number($("watch_hours").value)).toFixed(1);
+
 
   // ✅ Recalcular promedio diario
   calcAvgWatchTimePerDay();
@@ -236,8 +249,6 @@ function fillAuto() {
   // UX: quitar marcas de validación previas
   $("predictForm").classList.remove("was-validated");
 }
-
-
 
 function readPayload() {
   const subscription = $("subscription_type").value;
