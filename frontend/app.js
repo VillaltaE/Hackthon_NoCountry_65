@@ -287,7 +287,7 @@ function renderResult(apiResponse) {
   $("outProb").textContent = formatProb(prob);
 
   const riskLevel = updateRiskMeter(prob);
-  $("outPrevision").textContent = riskLevel ?? "—";
+  $("outPrevision").textContent = getPredictionText(label);
 
   const riskBadgeEl = document.getElementById("riskBadgeMain");
   if (riskBadgeEl && riskLevel) {
@@ -309,6 +309,17 @@ function renderResult(apiResponse) {
     `;
   }
 }
+
+function getPredictionText(label) {
+  if (label === 'will_continue') {
+    return 'Va a continuar';
+  } else if (label === 'will_churn') {
+    return 'Va a cancelar';
+  }
+  return '—';  // En caso de que no haya etiqueta
+}
+
+
 
 function openCurrentPredictionDetail(riskLevel) {
   const h = {
