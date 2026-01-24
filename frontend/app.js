@@ -319,9 +319,13 @@ function getPredictionText(label) {
   return '—';  // En caso de que no haya etiqueta
 }
 
-
-
 function openCurrentPredictionDetail(riskLevel) {
+  // Convertir "Moderado" a "medio" solo para predictionLabel
+  const modalRiskLabel = (() => {
+    if (riskLevel === "Moderado") return "medio";
+    return riskLevel ? riskLevel.toLowerCase() : null;
+  })();
+
   const h = {
     customerId: $("customer_id").value,
     subscriptionType: $("subscription_type").value,
@@ -338,11 +342,8 @@ function openCurrentPredictionDetail(riskLevel) {
         ? null
         : $("outLabel").textContent.trim(),
 
-    // Predicción legible para mostrar en UI
-    predictionLabel:
-      $("outPrevision").textContent === "—"
-        ? null
-        : $("outPrevision").textContent.trim(),
+    //Usar modalRiskLabel para que sea "Riesgo medio" cuando sea moderado
+    predictionLabel: modalRiskLabel ? "Riesgo " + modalRiskLabel : null,
 
     risk: riskLevel ?? "—",
 
