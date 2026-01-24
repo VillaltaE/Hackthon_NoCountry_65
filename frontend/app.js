@@ -240,7 +240,7 @@ if (scenario === "high") {
 }
 
 
-  $("watch_hours").value = Math.min(45, Number($("watch_hours").value)).toFixed(1);
+
 
 
   // ✅ Recalcular promedio diario
