@@ -30,10 +30,17 @@ function updatePagination() {
 
 function showAlert(type, msg) {
   const box = $("alertBox");
+
+  // Verifica si es un error de "fetch"
+  if (msg === "Failed to fetch") {
+    msg = "El servicio está temporalmente fuera de servicio. Por favor intenta nuevamente más tarde.";  // Mensaje personalizado
+  }
+
   box.className = `alert alert-${type}`;
   box.textContent = msg;
   box.classList.remove("d-none");
 }
+
 
 function hideAlert() {
   $("alertBox").classList.add("d-none");
