@@ -33,14 +33,14 @@ function showAlert(type, msg) {
 
   // Verifica si es un error de "fetch"
   if (msg === "Failed to fetch") {
-    msg = "El servicio está temporalmente fuera de servicio. Por favor intenta nuevamente más tarde.";  // Mensaje personalizado
+    msg =
+      "El servicio está temporalmente fuera de servicio. Por favor intenta nuevamente más tarde."; // Mensaje personalizado
   }
 
   box.className = `alert alert-${type}`;
   box.textContent = msg;
   box.classList.remove("d-none");
 }
-
 
 function hideAlert() {
   $("alertBox").classList.add("d-none");
@@ -181,21 +181,64 @@ async function pingHealth() {
   }
 }
 
+function randInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function randFloat(min, max, decimals = 1) {
+  const v = Math.random() * (max - min) + min;
+  const p = Math.pow(10, decimals);
+  return Math.round(v * p) / p;
+}
+
 function fillAuto() {
-  $("customer_id").value = "ed230";
-  $("subscription_type").value = "Basic";
-  $("payment_method").value = "Debit Card";
-  $("watch_hours").value = 5;
-  $("last_login_days").value = 4;
-  $("number_of_profiles").value = 1;
+  // Escenario: 40% alto churn, 40% bajo churn, 20% mixto
+  const r = Math.random();
+  const scenario = r < 0.4 ? "high" : r < 0.8 ? "low" : "mixed";
 
-  $("monthly_fee").value = planFee("Basic").toFixed(2);
+  // Plan (validación adicional)
+  const plans = ["Basic", "Standard", "Premium"];
+  const planIndex = randInt(0, plans.length - 1); // Seguridad adicional aquí
+  const plan = plans[planIndex] || "Basic"; // Si falla por alguna razón, "Basic" por defecto
+  $("subscription_type").value = plan;
 
-  // ✅ importante si ahora es automático
+  // Fee consistente con el plan
+  $("monthly_fee").value = planFee(plan).toFixed(2);
+
+  // ID válido
+  $("customer_id").value = `cli-${randInt(10000, 99999)}`;
+
+  const select = $("payment_method");
+  const values = [...select.options]
+    .map((o) => o.value)
+    .filter((v) => v !== "");
+
+  select.value = values[randInt(0, values.length - 1)];
+
+  // Escenarios
+  if (scenario === "high") {
+    $("watch_hours").value = randFloat(0.0, 8.0, 1);
+    $("last_login_days").value = randInt(15, 120);
+    $("number_of_profiles").value = randInt(1, 2);
+  } else if (scenario === "low") {
+    $("watch_hours").value = randFloat(20.0, 140.0, 1);
+    $("last_login_days").value = randInt(0, 5);
+    $("number_of_profiles").value = randInt(2, 5);
+  } else {
+    $("watch_hours").value = randFloat(8.0, 40.0, 1);
+    $("last_login_days").value = randInt(3, 20);
+    $("number_of_profiles").value = randInt(1, 4);
+  }
+
+  // ✅ Recalcular promedio diario
   calcAvgWatchTimePerDay();
 
+  // UX: quitar marcas de validación previas
   $("predictForm").classList.remove("was-validated");
 }
+
+
+
 
 function readPayload() {
   const subscription = $("subscription_type").value;
@@ -320,30 +363,26 @@ function renderResult(apiResponse) {
   }
 }
 
-
-
 function changePredictionColor(element, label) {
   if (label === "will_continue") {
-    element.style.backgroundColor = "transparent"; 
-    element.style.color = "var(--bs-success)"; 
+    element.style.backgroundColor = "transparent";
+    element.style.color = "var(--bs-success)";
   } else if (label === "will_churn") {
-    element.style.backgroundColor = "transparent"; 
-    element.style.color = "var(--bs-danger)"; 
+    element.style.backgroundColor = "transparent";
+    element.style.color = "var(--bs-danger)";
   } else {
-    element.style.backgroundColor = "transparent"; 
-    element.style.color = "var(--bs-secondary)"; 
+    element.style.backgroundColor = "transparent";
+    element.style.color = "var(--bs-secondary)";
   }
 }
 
-
-
 function getPredictionText(label) {
-  if (label === 'will_continue') {
-    return 'Va a continuar';
-  } else if (label === 'will_churn') {
-    return 'Va a cancelar';
+  if (label === "will_continue") {
+    return "Va a continuar";
+  } else if (label === "will_churn") {
+    return "Va a cancelar";
   }
-  return '—';  // En caso de que no haya etiqueta
+  return "—"; // En caso de que no haya etiqueta
 }
 
 function openCurrentPredictionDetail(riskLevel) {
@@ -654,7 +693,7 @@ function openHistoryDetail(btn) {
   const customerId = h.customerId ?? "—";
   const fee = h.monthlyFee ?? "—";
 
-body.innerHTML = `
+  body.innerHTML = `
   <!-- Header -->
   <div class="d-flex justify-content-between align-items-start gap-3 mb-3">
     <div>
@@ -781,7 +820,6 @@ body.innerHTML = `
 
   new bootstrap.Modal(document.getElementById("historyDetailModal")).show();
 }
-
 
 async function loadRiskFactors(customerId) {
   try {
