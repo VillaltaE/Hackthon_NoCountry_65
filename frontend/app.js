@@ -296,6 +296,9 @@ function renderResult(apiResponse) {
   const riskLevel = updateRiskMeter(prob);
   $("outPrevision").textContent = getPredictionText(label);
 
+  // Cambiar el color de la previsión según su valor (continuará o cancelará)
+  changePredictionColor($("outPrevision"), label);
+
   const riskBadgeEl = document.getElementById("riskBadgeMain");
   if (riskBadgeEl && riskLevel) {
     riskBadgeEl.innerHTML = riskBadge(riskLevel);
@@ -316,6 +319,23 @@ function renderResult(apiResponse) {
     `;
   }
 }
+
+
+
+function changePredictionColor(element, label) {
+  if (label === "will_continue") {
+    element.style.backgroundColor = "transparent"; // Fondo transparente
+    element.style.color = "rgb(1, 198, 1)"; // Verde claro
+  } else if (label === "will_churn") {
+    element.style.backgroundColor = "transparent"; // Fondo transparente
+    element.style.color = "rgb(243, 0, 0)"; // Verde claro
+  } else {
+    element.style.backgroundColor = "transparent"; // Fondo transparente
+    element.style.color = "gray"; // Texto gris en caso de que no haya predicción
+  }
+}
+
+
 
 function getPredictionText(label) {
   if (label === 'will_continue') {
