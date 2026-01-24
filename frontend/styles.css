@@ -229,3 +229,30 @@ code{ color: #FF78B9; }
 }
 
 
+.demo-card {
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.02)
+  );
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.demo-card .card-title {
+  font-weight: 600;
+  color: #9ddcff;
+}
+
+.demo-card .card-text {
+  font-size: 0.9rem;
+  color: white !important; /* Ajuste para que el texto sea blanco */
+  opacity: 1 !important; /* Opcional, para garantizar que el texto no tenga opacidad */
+}
+
+
+
+.demo-card .card-body {
+  background-color: rgba(0, 0, 0, 0.3); /* Fondo sutil para contraste */
+}
+
+

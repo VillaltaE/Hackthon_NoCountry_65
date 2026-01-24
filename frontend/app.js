@@ -239,7 +239,6 @@ function fillAuto() {
 
 
 
-
 function readPayload() {
   const subscription = $("subscription_type").value;
 

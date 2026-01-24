@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
   <head>
     <meta charset="utf-8" />
@@ -59,42 +59,56 @@
     </nav>
 
     <main class="container py-3 py-lg-3">
-
       <!-- =============================== KPIs Section =============================== -->
-      <div class="d-flex justify-content-between flex-wrap mb-3" id="kpisSection">
-
+      <div
+        class="d-flex justify-content-between flex-wrap mb-3"
+        id="kpisSection"
+      >
         <!-- Total Evaluados -->
-        <div class="card text-center bg-dark text-white p-1 m-1 flex-fill" style="min-width: 150px;">
+        <div
+          class="card text-center bg-dark text-white p-1 m-1 flex-fill"
+          style="min-width: 150px"
+        >
           <div class="card-title text-secondary mb-2">Total Evaluados</div>
           <div class="h4 fw-bold" id="kpiTotal">—</div>
         </div>
 
         <!-- Riesgo Alto -->
-        <div class="card text-center bg-danger text-white p-1 m-1 flex-fill" style="min-width: 150px;">
+        <div
+          class="card text-center bg-danger text-white p-1 m-1 flex-fill"
+          style="min-width: 150px"
+        >
           <div class="card-title text-white mb-2">Riesgo Alto</div>
           <div class="h4 fw-bold" id="kpiHigh">—</div>
         </div>
 
         <!-- Riesgo Medio -->
-        <div class="card text-center bg-warning text-dark p-1 m-1 flex-fill" style="min-width: 150px;">
+        <div
+          class="card text-center bg-warning text-dark p-1 m-1 flex-fill"
+          style="min-width: 150px"
+        >
           <div class="card-title text-dark mb-2">Riesgo Medio</div>
           <div class="h4 fw-bold" id="kpiMedium">—</div>
         </div>
 
         <!-- Riesgo Bajo -->
-        <div class="card text-center bg-success text-white p-1 m-1 flex-fill" style="min-width: 150px;">
+        <div
+          class="card text-center bg-success text-white p-1 m-1 flex-fill"
+          style="min-width: 150px"
+        >
           <div class="card-title text-white mb-2">Riesgo Bajo</div>
           <div class="h4 fw-bold" id="kpiLow">—</div>
         </div>
 
         <!-- Tasa de churn -->
-        <div class="card text-center bg-info text-white p-1 m-1 flex-fill" style="min-width: 150px;">
+        <div
+          class="card text-center bg-info text-white p-1 m-1 flex-fill"
+          style="min-width: 150px"
+        >
           <div class="card-title text-white mb-2">Tasa de churn (%)</div>
           <div class="h4 fw-bold" id="kpiChurnRate">—</div>
         </div>
-
       </div>
-
 
       <div class="row g-4 align-items-stretch">
         <!-- Left: Form -->
@@ -162,44 +176,69 @@
                     <div class="invalid-feedback">Selecciona un plan.</div>
                   </div>
 
-                  <div class="col-12 col-md-6">
-                    <label class="form-label" for="payment_method"
-                      >Método de pago</label
-                    >
-                    <select class="form-select" id="payment_method" required>
-                      <option value="" selected disabled>
-                        Selecciona método
-                      </option>
-                      <option>Credit Card</option>
-                      <option>Debit Card</option>
-                      <option>PayPal</option>
-                      <option>Gift Card</option>
-                      <option>Crypto</option>
-                    </select>
-                    <div class="invalid-feedback">
-                      Selecciona un método de pago.
+                  <div class="row g-3">
+                    <!-- Método de pago -->
+                    <div class="col-12 col-md-4">
+                      <label class="form-label" for="payment_method"
+                        >Método de pago</label
+                      >
+                      <select class="form-select" id="payment_method" required>
+                        <option value="" selected disabled>
+                          Selecciona método
+                        </option>
+                        <option>Credit Card</option>
+                        <option>Debit Card</option>
+                        <option>PayPal</option>
+                        <option>Gift Card</option>
+                        <option>Crypto</option>
+                      </select>
+                      <div class="invalid-feedback">
+                        Selecciona un método de pago.
+                      </div>
                     </div>
-                  </div>
 
-                  <div class="col-12 col-md-6">
-                    <label class="form-label" for="monthly_fee"
-                      >Tarifa mensual</label
-                    >
-                    <div class="input-group">
-                      <span class="input-group-text">$</span>
+                    <!-- Tarifa mensual -->
+                    <div class="col-12 col-md-4">
+                      <label class="form-label" for="monthly_fee"
+                        >Tarifa mensual</label
+                      >
+                      <div class="input-group">
+                        <span class="input-group-text">$</span>
+                        <input
+                          class="form-control"
+                          id="monthly_fee"
+                          type="number"
+                          step="0.01"
+                          min="0"
+                          max="1000"
+                          placeholder="17.99"
+                          required
+                          readonly
+                        />
+                        <div class="form-text text-secondary">
+                          Se calcula automáticamente.
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Promedio diario -->
+                    <div class="col-12 col-md-4">
+                      <label class="form-label" for="avg_watch_time_per_day"
+                        >Promedio diario (hrs)</label
+                      >
                       <input
                         class="form-control"
-                        id="monthly_fee"
+                        id="avg_watch_time_per_day"
                         type="number"
                         step="0.01"
                         min="0"
-                        max="1000"
-                        placeholder="8.99"
+                        max="24"
+                        placeholder="2,27"
                         required
                         readonly
                       />
-                      <div class="invalid-feedback">
-                        Ingresa una tarifa válida (>= 0).
+                      <div class="form-text text-secondary">
+                        Se calcula automáticamente.
                       </div>
                     </div>
                   </div>
@@ -261,25 +300,6 @@
                     </div>
                   </div>
 
-                  <div class="col-12 col-md-4">
-                    <label class="form-label" for="avg_watch_time_per_day">Promedio diario (hrs)</label>
-                    <input
-                    class="form-control"
-                    id="avg_watch_time_per_day"
-                    type="number"
-                    step="0.01"
-                    min="0"
-                    max="24"
-                    placeholder="0.9"
-                    required
-                    readonly
-                    />
-                    <div class="form-text text-secondary">
-                    Se calcula automáticamente.
-                    </div>
-                  <div class="invalid-feedback">Ingresa un promedio válido (0–24).</div>
-                  </div>
-
                   <div class="col-12 col-md-6 d-flex align-items-end gap-2">
                     <button
                       class="btn btn-primary w-100"
@@ -294,14 +314,7 @@
                         aria-hidden="true"
                       ></span>
                     </button>
-                    <button
-                      class="btn btn-outline-light"
-                      id="btnAuto"
-                      type="button"
-                      title="Completar ejemplo"
-                    >
-                      Auto
-                    </button>
+
                     <button
                       class="btn btn-outline-light"
                       id="btnClear"
@@ -313,6 +326,22 @@
                   </div>
                 </div>
               </form>
+
+              <div class="card demo-card mt-4">
+                <div class="card-body">
+                  <h5 class="card-title">🧪 Datos de demostración</h5>
+
+                  <p class="card-text text-muted">
+                    Genera automáticamente un conjunto de datos válidos para
+                    mostrar el funcionamiento del modelo de predicción de churn,
+                    sin ingresar información manual.
+                  </p>
+
+                  <button class="btn btn-outline-info" id="btnAuto">
+                    Generar datos de demostración
+                  </button>
+                </div>
+              </div>
 
               <hr class="my-4 border-white border-opacity-10" />
 
@@ -339,14 +368,15 @@
 
               <div class="result-box">
                 <!-- Estado inicial (antes de predecir) -->
-              <div id="resultEmpty" class="py-3">
+                <div id="resultEmpty" class="py-3">
                   <div class="d-flex gap-2 align-items-start">
                     <i class="bi bi-graph-up-arrow text-secondary"></i>
                     <div class="small text-secondary">
-                    Aún no hay resultados. Completa el formulario y presiona <b>Predecir</b>.
+                      Aún no hay resultados. Completa el formulario y presiona
+                      <b>Predecir</b>.
+                    </div>
                   </div>
-                  </div>
-              </div>
+                </div>
                 <div class="row g-3" id="resultContent">
                   <div class="col-12">
                     <div class="label">ID del cliente</div>
@@ -415,9 +445,7 @@
         <div class="col-12">
           <div class="card card-soft">
             <div class="card-body p-4 p-lg-5">
-              <h2 class="h5 mb-1 text-white fw-semibold">
-                Historial
-              </h2>
+              <h2 class="h5 mb-1 text-white fw-semibold">Historial</h2>
               <p class="text-secondary mb-4">
                 Últimas predicciones realizadas (máx. 10). Filtra por cliente o
                 rango de fechas.
@@ -476,7 +504,6 @@
                       <th class="text-end">Prob.</th>
                       <!-- Alineación a la derecha -->
                       <th class="text-center">Acción</th>
-                      
                     </tr>
                   </thead>
                   <tbody id="historyTbody"></tbody>
@@ -488,12 +515,19 @@
               </div>
 
               <!-- Paginación -->
-            <div class="d-flex justify-content-between align-items-center mt-4">
-            <button class="btn btn-outline-light" id="btnPrev" disabled>Anterior</button>
-            <span id="currentPage" class="text-white-50 small">Página 1</span>
-            <button class="btn btn-outline-light" id="btnNext">Siguiente</button>
-            </div>
-
+              <div
+                class="d-flex justify-content-between align-items-center mt-4"
+              >
+                <button class="btn btn-outline-light" id="btnPrev" disabled>
+                  Anterior
+                </button>
+                <span id="currentPage" class="text-white-50 small"
+                  >Página 1</span
+                >
+                <button class="btn btn-outline-light" id="btnNext">
+                  Siguiente
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -519,7 +553,6 @@
         </div>
       </div>
     </div>
-    
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="./app.js"></script>
