@@ -57,7 +57,32 @@ Detectar clientes con alta probabilidad de churn permite:
 
 ### 📺 Live Demo 
 
-Proximamente demo del proyecto.
+La interfaz web tiene varios componentes:
+ 
+- En la parte superior encontramos indicadores básicos de churn, como número de clientes evaluados, cantidad de clientes en riesgo alto, medio y bajo, así como también la tasa de churn.
+
+![demo_1](https://i.ibb.co/HfcZGFgb/ezgif-1ce0a1e4657b3ac7.gif)
+
+- Debajo de los indicadores encontramos dos paneles, en el lado izquierdo cargamos los datos sobre el cliente que queremos analizar y luego seleccionamos el botón predecir
+
+![demo_2](https://i.ibb.co/fd3fr5W8/ezgif-1c2cea7233168f64.gif)
+
+-  Podemos pedirle al sistema que nos genere una predicción de carácter aleatorio para observar como funciona la aplicación.
+
+![demo_3](https://i.ibb.co/LzrTFJn5/ezgif-1128632c906a20c3.gif)
+
+- En el panel derecho encontramos el resultado de la predicción: la etiqueta va a continuar / va cancelar junto con la probabilidad de deserción. También, podemos hace click en el botón ver detalles de la predicción para obtener más información sobre el comportamiento del usuario así como también acciones sugeridas.
+
+![demo_4](https://i.ibb.co/SwP4WZSB/ezgif-5ea4ac3960582d49.gif)
+ 
+- Abajo de los dos paneles encontramos el historial de predicciones, donde podemos acceder a predicciones ya realizadas anteriormente. Tenemos una función de filtro, se puede buscar una predicción o predicciones por id de cliente o por fechas. Además, hay un botón para descargar el historial en formato csv.
+
+![demo_5](https://i.ibb.co/39BZfBmH/demo-5.gif)
+
+Consulta el siguiente video para ver la live demo completa: 
+
+[Live Demo](https://youtu.be/nOfDL6W6_QA)
+
 
 ---
 
