@@ -86,6 +86,80 @@ Consulta el siguiente video para ver la live demo completa:
 
 ---
 
+### 📝 Ejemplos de petición y respuesta
+
+La API recibe la siguiente petición con los datos del cliente:
+
+```
+{
+  "customer_id": "user-123",
+  "features": {
+    "subscription_type": "Premium",
+    "watch_hours": 120.5,
+    "last_login_days": 3,
+    "monthly_fee": 17.99,
+    "number_of_profiles": 4,
+    "avg_watch_time_per_day": 2.5,
+    "payment_method": "Credit Card"
+  }
+}
+
+```
+
+y retorna la respuesta de la petición en el siguiente formato:
+
+- ✅ Si la predicción se generó correctamente
+
+```
+{
+  "timestamp": "2026-01-12T15:45:30",
+  "status": 200,
+  "message": "Predicción generada correctamente",
+  "data": {
+    "customer_id": "user-123",
+    "prediction": {
+      "label": "will_churn",
+      "probability": 0.82
+    },
+    "prevision": "Va a cancelar"
+  },
+  "path": "/api/predict"
+}
+
+```
+- ❌ Si hubo algún error en la petición
+
+```
+
+{
+  "timestamp": "2026-01-12T15:45:30",
+  "status": 400,
+  "error": "Error de Validación",
+  "details": {
+    "features.numberOfProfiles": "el valor debe estar entre 1 y 5"
+  },
+  "path": "/api/predict"
+}
+
+```
+
+- ❌ Si el modelo Machine Learning está fuera de servicio
+
+```
+
+{
+  "timestamp": "2026-01-12T15:45:30",
+  "status": 503,
+  "error": "Servicio ML no disponible",
+  "details": {
+    "ml_service": "timeout al intentar obtener predicción"
+  },
+  "path": "/api/predict"
+}
+
+```
+---
+
 ### 🧠 Arquitectura del proyecto
 
 Construimos una arquitectura multi-backend orientada a la predicción de churn. A continuación, un esquema de la estructura del proyecto:
